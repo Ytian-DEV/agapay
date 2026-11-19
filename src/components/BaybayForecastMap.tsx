@@ -34,47 +34,46 @@ interface BaybayForecastMapProps {
   flyToTrigger: number;
 }
 
+function getZoneColor(z: BarangayZoneFeatureData, layer: ForecastLayer): string {
+  if (layer === 'rain') {
+    if (z.rainMm >= 55) return '#dc2626';
+    if (z.rainMm >= 40) return '#d97706';
+    if (z.rainMm >= 30) return '#2563eb';
+    return '#0284c7';
+  }
+  if (layer === 'soil') {
+    if (z.soilMoisturePct >= 55) return '#1d4ed8';
+    if (z.soilMoisturePct >= 40) return '#0d9488';
+    return '#65a30d';
+  }
+  if (layer === 'flood') {
+    if (z.floodRisk === 'high') return '#dc2626';
+    if (z.floodRisk === 'medium') return '#d97706';
+    return '#16a34a';
+  }
+  if (z.decision === 'avoid') return '#dc2626';
+  if (z.decision === 'wait') return '#d97706';
+  return '#16a34a';
+}
+
+function getZoneReading(z: BarangayZoneFeatureData, layer: ForecastLayer): string {
+  if (layer === 'rain') return `${z.rainMm} mm`;
+  if (layer === 'soil') return `${z.soilMoisturePct}%`;
+  if (layer === 'flood') return z.floodRisk.toUpperCase();
+  return z.decision.toUpperCase();
+}
+
 /**
- * Generates clean hexagonal/parcel-shaped GeoJSON polygons centered on each Baybay City barangay
- * so MapLibre renders crisp clickable forecast zones synced to real geography.
+ * Generates clean GeoJSON forecast zones over each Baybay City barangay.
  */
 function buildZonesGeoJson(
   zones: BarangayZoneFeatureData[],
   layer: ForecastLayer
 ): GeoJSON.FeatureCollection<GeoJSON.Polygon> {
-  const radiusLng = 0.0085;
-  const radiusLat = 0.0068;
+  const radiusLng = 0.0078;
+  const radiusLat = 0.0062;
 
-  const colorForZone = (z: BarangayZoneFeatureData): string => {
-    if (layer === 'rain') {
-      if (z.rainMm >= 55) return '#dc2626';
-      if (z.rainMm >= 40) return '#d97706';
-      if (z.rainMm >= 30) return '#2563eb';
-      return '#0ea5e9';
-    }
-    if (layer === 'soil') {
-      if (z.soilMoisturePct >= 55) return '#1d4ed8';
-      if (z.soilMoisturePct >= 40) return '#0d9488';
-      return '#65a30d';
-    }
-    if (layer === 'flood') {
-      if (z.floodRisk === 'high') return '#dc2626';
-      if (z.floodRisk === 'medium') return '#d97706';
-      return '#16a34a';
-    }
-    if (z.decision === 'avoid') return '#dc2626';
-    if (z.decision === 'wait') return '#d97706';
-    return '#16a34a';
-  };
-
-  const badgeText = (z: BarangayZoneFeatureData): string => {
-    if (layer === 'rain') return `${z.name}\n${z.rainMm} mm`;
-    if (layer === 'soil') return `${z.name}\n${z.soilMoisturePct}%`;
-    if (layer === 'flood') return `${z.name}\n${z.floodRisk.toUpperCase()}`;
-    return `${z.name}\n${z.decision.toUpperCase()}`;
-  };
-
-  const features: GeoJSON.Feature<GeoJSON.Polygon>[] = zones.map((z) => {
+  const features: GeoJSON.Feature<GeoJSON.Polygon>[] = zones.map((z, idx) => {
     const ring: [number, number][] = [];
     for (let i = 0; i < 6; i++) {
       const angle = (Math.PI / 3) * i + Math.PI / 6;
@@ -87,12 +86,11 @@ function buildZonesGeoJson(
 
     return {
       type: 'Feature',
-      id: z.barangayId,
+      id: idx + 1,
       properties: {
         barangayId: z.barangayId,
         name: z.name,
-        fillColor: colorForZone(z),
-        label: badgeText(z),
+        fillColor: getZoneColor(z, layer),
       },
       geometry: {
         type: 'Polygon',
@@ -149,6 +147,44 @@ export function buildBarangayZones(barangays: Barangay[]): BarangayZoneFeatureDa
   });
 }
 
+function getMapStyle(
+  basemap: 'streets' | 'satellite',
+  isDark: boolean
+): string | maplibregl.StyleSpecification {
+  if (basemap === 'streets') {
+    // 100% free, zero-API-key official OpenFreeMap vector tiles for MapLibre GL!
+    return isDark
+      ? 'https://tiles.openfreemap.org/styles/dark'
+      : 'https://tiles.openfreemap.org/styles/liberty';
+  }
+
+  // Free zero-API-key ESRI World Imagery satellite + place labels
+  return {
+    version: 8,
+    sources: {
+      'esri-satellite': {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        ],
+        tileSize: 256,
+        attribution: '© Esri, Maxar, Earthstar Geographics',
+      },
+      'esri-labels': {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+        ],
+        tileSize: 256,
+      },
+    },
+    layers: [
+      { id: 'esri-satellite-layer', type: 'raster', source: 'esri-satellite' },
+      { id: 'esri-labels-layer', type: 'raster', source: 'esri-labels' },
+    ],
+  };
+}
+
 export function BaybayForecastMap({
   zones,
   selectedBarangayId,
@@ -164,6 +200,9 @@ export function BaybayForecastMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const fieldMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const zoneMarkersRef = useRef<maplibregl.Marker[]>([]);
+  const onSelectZoneRef = useRef(onSelectZone);
+  onSelectZoneRef.current = onSelectZone;
 
   const [basemap, setBasemap] = useState<'streets' | 'satellite'>('streets');
   const [radarTileUrl, setRadarTileUrl] = useState<string | null>(null);
@@ -194,89 +233,110 @@ export function BaybayForecastMap({
     };
   }, [isOnline]);
 
-  // Build MapLibre style spec (reacts to Light/Dark & Street/Satellite toggle)
-  const buildBaseTileUrl = () => {
-    if (basemap === 'satellite') {
-      return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+  // Sync GeoJSON forecast polygons + live RainViewer radar onto an already-loaded map
+  const syncForecastLayers = (map: maplibregl.Map) => {
+    if (!map.getSource('agapay-zones')) {
+      map.addSource('agapay-zones', {
+        type: 'geojson',
+        data: geojson,
+      });
+      map.addLayer({
+        id: 'agapay-zones-fill',
+        type: 'fill',
+        source: 'agapay-zones',
+        paint: {
+          'fill-color': ['get', 'fillColor'],
+          'fill-opacity': 0.34,
+        },
+      });
+      map.addLayer({
+        id: 'agapay-zones-outline',
+        type: 'line',
+        source: 'agapay-zones',
+        paint: {
+          'line-color': ['get', 'fillColor'],
+          'line-width': [
+            'case',
+            ['==', ['get', 'barangayId'], selectedBarangayId],
+            3.5,
+            1.5,
+          ],
+        },
+      });
+
+      map.on('click', 'agapay-zones-fill', (e: maplibregl.MapLayerMouseEvent) => {
+        const brgyId = e.features?.[0]?.properties?.barangayId as string | undefined;
+        if (brgyId) onSelectZoneRef.current(brgyId);
+      });
+      map.on('mouseenter', 'agapay-zones-fill', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'agapay-zones-fill', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    } else {
+      const src = map.getSource('agapay-zones') as maplibregl.GeoJSONSource;
+      src.setData(geojson);
+      if (map.getLayer('agapay-zones-outline')) {
+        map.setPaintProperty('agapay-zones-outline', 'line-width', [
+          'case',
+          ['==', ['get', 'barangayId'], selectedBarangayId],
+          3.8,
+          1.5,
+        ]);
+      }
     }
-    return isDark
-      ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'
-      : 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png';
+
+    // Sync live RainViewer precipitation radar layer when Rain tab is active
+    const hasRadarLayer = Boolean(map.getLayer('agapay-rain-radar-layer'));
+    if (layer === 'rain' && radarTileUrl) {
+      if (!map.getSource('agapay-rain-radar')) {
+        map.addSource('agapay-rain-radar', {
+          type: 'raster',
+          tiles: [radarTileUrl],
+          tileSize: 256,
+        });
+      }
+      if (!hasRadarLayer) {
+        map.addLayer(
+          {
+            id: 'agapay-rain-radar-layer',
+            type: 'raster',
+            source: 'agapay-rain-radar',
+            paint: { 'raster-opacity': 0.55 },
+          },
+          'agapay-zones-fill'
+        );
+      } else {
+        map.setLayoutProperty('agapay-rain-radar-layer', 'visibility', 'visible');
+      }
+      setRadarActive(true);
+    } else {
+      if (hasRadarLayer) {
+        map.setLayoutProperty('agapay-rain-radar-layer', 'visibility', 'none');
+      }
+      setRadarActive(false);
+    }
   };
 
-  // Initialize MapLibre instance
+  // Initialize MapLibre GL map (re-creates cleanly when basemap or theme switches)
   useEffect(() => {
     if (!containerRef.current) return;
 
     const map = new maplibregl.Map({
       container: containerRef.current,
       center: [fieldLng || 124.8005, fieldLat || 10.7145],
-      zoom: 12.1,
-      minZoom: 10,
-      maxZoom: 16.5,
+      zoom: 12.0,
+      minZoom: 9.5,
+      maxZoom: 17,
       attributionControl: false,
-      style: {
-        version: 8,
-        sources: {
-          basemap: {
-            type: 'raster',
-            tiles: [buildBaseTileUrl()],
-            tileSize: 256,
-            attribution: '© OpenStreetMap · CARTO · Esri',
-          },
-          zones: {
-            type: 'geojson',
-            data: geojson,
-          },
-        },
-        layers: [
-          {
-            id: 'basemap-layer',
-            type: 'raster',
-            source: 'basemap',
-          },
-          {
-            id: 'zones-fill',
-            type: 'fill',
-            source: 'zones',
-            paint: {
-              'fill-color': ['get', 'fillColor'],
-              'fill-opacity': 0.36,
-            },
-          },
-          {
-            id: 'zones-outline',
-            type: 'line',
-            source: 'zones',
-            paint: {
-              'line-color': ['get', 'fillColor'],
-              'line-width': [
-                'case',
-                ['==', ['get', 'barangayId'], selectedBarangayId],
-                3.5,
-                1.5,
-              ],
-            },
-          },
-        ],
-      },
+      style: getMapStyle(basemap, isDark),
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
-    map.on('click', 'zones-fill', (e: maplibregl.MapLayerMouseEvent) => {
-      const feature = e.features?.[0];
-      const brgyId = feature?.properties?.barangayId as string | undefined;
-      if (brgyId) {
-        onSelectZone(brgyId);
-      }
-    });
-
-    map.on('mouseenter', 'zones-fill', () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', 'zones-fill', () => {
-      map.getCanvas().style.cursor = '';
+    map.on('load', () => {
+      syncForecastLayers(map);
     });
 
     mapRef.current = map;
@@ -284,92 +344,92 @@ export function BaybayForecastMap({
     return () => {
       fieldMarkerRef.current?.remove();
       fieldMarkerRef.current = null;
+      zoneMarkersRef.current.forEach((m) => m.remove());
+      zoneMarkersRef.current = [];
       map.remove();
       mapRef.current = null;
     };
-    // Re-init only when basemap or light/dark theme changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [basemap, isDark]);
 
-  // Sync GeoJSON data & selected outline whenever layer/zones/selection change
+  // Update forecast layers whenever layer, zones, selection, or live radar changes
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    const applyUpdates = () => {
-      const src = map.getSource('zones') as maplibregl.GeoJSONSource | undefined;
-      if (src) {
-        src.setData(geojson);
-      }
-      if (map.getLayer('zones-outline')) {
-        map.setPaintProperty('zones-outline', 'line-width', [
-          'case',
-          ['==', ['get', 'barangayId'], selectedBarangayId],
-          3.8,
-          1.5,
-        ]);
-      }
-
-      // Sync live RainViewer precipitation radar layer when Rain tab is active!
-      const hasRadarLayer = Boolean(map.getLayer('rain-radar-layer'));
-      if (layer === 'rain' && radarTileUrl) {
-        if (!map.getSource('rain-radar')) {
-          map.addSource('rain-radar', {
-            type: 'raster',
-            tiles: [radarTileUrl],
-            tileSize: 256,
-          });
-        }
-        if (!hasRadarLayer) {
-          map.addLayer(
-            {
-              id: 'rain-radar-layer',
-              type: 'raster',
-              source: 'rain-radar',
-              paint: { 'raster-opacity': 0.58 },
-            },
-            'zones-fill'
-          );
-        } else {
-          map.setLayoutProperty('rain-radar-layer', 'visibility', 'visible');
-        }
-        setRadarActive(true);
-      } else {
-        if (hasRadarLayer) {
-          map.setLayoutProperty('rain-radar-layer', 'visibility', 'none');
-        }
-        setRadarActive(false);
-      }
-    };
-
     if (map.isStyleLoaded()) {
-      applyUpdates();
+      syncForecastLayers(map);
     } else {
-      map.once('load', applyUpdates);
+      map.once('load', () => syncForecastLayers(map));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geojson, selectedBarangayId, layer, radarTileUrl]);
 
-  // Sync farmer's field marker pin + barangay quick labels
+  // Render crisp interactive barangay forecast badges directly on the real map
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    zoneMarkersRef.current.forEach((m) => m.remove());
+    zoneMarkersRef.current = [];
+
+    zones.forEach((z) => {
+      const color = getZoneColor(z, layer);
+      const reading = getZoneReading(z, layer);
+      const isSelected = z.barangayId === selectedBarangayId;
+
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.style.cssText = `
+        display:flex;align-items:center;gap:4px;
+        background:${isSelected ? color : 'rgba(17,19,18,0.82)'};
+        color:#ffffff;
+        border:2px solid ${color};
+        border-radius:999px;
+        padding:3px 8px;
+        font-size:10px;
+        font-weight:700;
+        cursor:pointer;
+        white-space:nowrap;
+        box-shadow:0 2px 8px rgba(0,0,0,0.3);
+      `;
+      el.innerHTML = `<span>${z.name}</span><span style="opacity:.95;">· ${reading}</span>`;
+      el.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        onSelectZoneRef.current(z.barangayId);
+      });
+
+      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+        .setLngLat([z.centerLng, z.centerLat])
+        .addTo(map);
+      zoneMarkersRef.current.push(marker);
+    });
+  }, [zones, layer, selectedBarangayId, basemap, isDark]);
+
+  // Render farmer's active field pin slightly offset above center so it never hides the barangay badge
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     fieldMarkerRef.current?.remove();
     const el = document.createElement('div');
-    el.className = 'agapay-field-pin';
     el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:5px;background:#111312;color:#ffffff;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.35);border:2px solid #4fb67f;white-space:nowrap;">
+      <div style="display:flex;align-items:center;gap:5px;background:#111312;color:#ffffff;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,0.4);border:2px solid #4fb67f;white-space:nowrap;">
         <span style="width:8px;height:8px;border-radius:999px;background:#4fb67f;display:inline-block;"></span>
         <span>${fieldName}</span>
       </div>
     `;
 
-    fieldMarkerRef.current = new maplibregl.Marker({ element: el, anchor: 'bottom' })
-      .setLngLat([fieldLng, fieldLat])
+    fieldMarkerRef.current = new maplibregl.Marker({
+      element: el,
+      anchor: 'bottom',
+      offset: [0, -18],
+    })
+      .setLngLat([fieldLng || 124.7962, fieldLat || 10.7285])
       .addTo(map);
   }, [fieldLng, fieldLat, fieldName, basemap, isDark]);
 
-  // Fly smoothly to selected zone or user's field
+  // Smooth flyTo when selecting a barangay or tapping "My field"
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -378,7 +438,7 @@ export function BaybayForecastMap({
       map.flyTo({
         center: [z.centerLng, z.centerLat],
         zoom: 12.6,
-        duration: 650,
+        duration: 600,
       });
     }
   }, [selectedBarangayId, flyToTrigger, zones]);
@@ -387,7 +447,7 @@ export function BaybayForecastMap({
     <div className="relative overflow-hidden rounded-[22px] border border-[var(--border)] bg-[var(--surface)] shadow-sm">
       <div ref={containerRef} className="h-[340px] w-full sm:h-[380px]" />
 
-      {/* Top-Left Live Sync Badge + Basemap Toggle */}
+      {/* Top-Left Basemap Toggle & Live Radar Pill */}
       <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col gap-1.5">
         <button
           type="button"
@@ -406,7 +466,7 @@ export function BaybayForecastMap({
         )}
       </div>
 
-      {/* Bottom-Left Quick Barangay Chips on Map */}
+      {/* Bottom Quick Barangay Strip */}
       <div className="border-t border-[var(--border)] bg-[var(--surface)] px-3 py-2.5">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
           {zones.map((z) => {
