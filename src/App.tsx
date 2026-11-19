@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './context/ThemeContext';
+import { AppStateProvider } from './context/AppStateContext';
 import { MobileShell } from './components/MobileShell';
 import { AgapayLogo } from './components/AgapayLogo';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
@@ -26,31 +27,33 @@ function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitle
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={<PlaceholderView titleKey="brand.name" subtitleKey="brand.tagline" />}
-          />
-          <Route
-            path="/home"
-            element={<PlaceholderView titleKey="nav.home" subtitleKey="home.plantingWindow" />}
-          />
-          <Route
-            path="/map"
-            element={<PlaceholderView titleKey="nav.map" subtitleKey="map.tapCellHint" />}
-          />
-          <Route
-            path="/alerts"
-            element={<PlaceholderView titleKey="alerts.title" subtitleKey="alerts.smsActiveNote" />}
-          />
-          <Route
-            path="/profile"
-            element={<PlaceholderView titleKey="profile.title" subtitleKey="profile.privacySupport" />}
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <AppStateProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={<PlaceholderView titleKey="brand.name" subtitleKey="brand.tagline" />}
+            />
+            <Route
+              path="/home"
+              element={<PlaceholderView titleKey="nav.home" subtitleKey="home.plantingWindow" />}
+            />
+            <Route
+              path="/map"
+              element={<PlaceholderView titleKey="nav.map" subtitleKey="map.tapCellHint" />}
+            />
+            <Route
+              path="/alerts"
+              element={<PlaceholderView titleKey="alerts.title" subtitleKey="alerts.smsActiveNote" />}
+            />
+            <Route
+              path="/profile"
+              element={<PlaceholderView titleKey="profile.title" subtitleKey="profile.privacySupport" />}
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AppStateProvider>
     </ThemeProvider>
   );
 }
