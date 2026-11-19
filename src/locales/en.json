@@ -105,7 +105,11 @@
     "yieldEstimate": "Yield estimate",
     "yieldEstimateSub": "Pre-planting sacks per hectare",
     "offlineBanner": "Offline mode — showing last saved forecast.",
-    "pendingSync": "Queued reports will sync automatically when signal returns."
+    "pendingSync": "Queued reports will sync automatically when signal returns.",
+    "waterloggingLow": "Low risk",
+    "waterloggingHigh": "High risk",
+    "waterloggingCheck": "Check field",
+    "soilWet": "Soil {{pct}}% wet"
   },
   "map": {
     "layerRain": "Rain",
@@ -117,7 +121,14 @@
     "openWhy": "Why this advice & sources",
     "legendGo": "GO · Ready",
     "legendWait": "WAIT · Recheck",
-    "legendAvoid": "AVOID · Wet risk"
+    "legendAvoid": "AVOID · Wet risk",
+    "myField": "My field",
+    "rainLegendTitle": "7-day Rain",
+    "soilLegendTitle": "Soil Moisture",
+    "suitabilityLegendTitle": "Planting Status",
+    "summaryGo": "Well-drained soil and steady moisture. Ready for planting or ridge prep.",
+    "summaryWait": "Surface soil is still damp. Recheck drainage ditches before sowing.",
+    "summaryAvoid": "High standing-water risk detected by radar. Delay dryland sowing 3–4 days."
   },
   "alerts": {
     "title": "Alerts",
@@ -128,7 +139,15 @@
     "noAlerts": "No active risk alerts for your barangay.",
     "disputeAdvisory": "Dispute or flag this advisory",
     "disputeSent": "Feedback logged for local technician review.",
-    "alertDetailTitle": "Alert details"
+    "alertDetailTitle": "Alert details",
+    "catHeavyRainTitle": "Heavy rain expected soon",
+    "catHeavyRainAction": "Delay sowing 2–3 days & clear canals",
+    "catWaterloggingTitle": "Waterlogging risk in low plots",
+    "catWaterloggingAction": "Check standing water & raise ridges",
+    "catDrySpellTitle": "Brief dry spell ahead",
+    "catDrySpellAction": "Water young seedlings early morning",
+    "catWindowTitle": "Planting window opening soon",
+    "catWindowAction": "Prepare certified seeds & beds"
   },
   "rain": {
     "title": "Is it raining?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Forecast accuracy",
     "accuracyNote": "Your rain check-ins and harvest reports recalibrate forecasts each season.",
     "guidesTitle": "Crop & drainage guides",
-    "guideDrainageTip": "Drainage & wet-season tip"
+    "guideDrainageTip": "Drainage & wet-season tip",
+    "plantingMonth": "Planting month",
+    "thisMonth": "This month",
+    "catAll": "All crops",
+    "catGrains": "Rice & Corn",
+    "catRoots": "Root crops",
+    "catVegetables": "Vegetables",
+    "catLegumes": "Legumes",
+    "catFruitsFiber": "Fruits & Fiber",
+    "proBanner": "Full AI crowding alerts unlock on Agapay Pro (₱69/mo).",
+    "recommendedForMonth": "Best to plant in {{month}}",
+    "inSeasonLabel": "in season",
+    "inSeasonBadge": "In season",
+    "noInSeasonCategory": "No crops in this category are in season for {{month}}.",
+    "otherInSeason": "More in-season crops ({{month}})",
+    "outOfSeasonHeading": "Not in season for {{month}} — wait",
+    "outOfSeasonBadge": "Off-season",
+    "bestMonthsLabel": "Best months",
+    "crowdingAdvice": "Only in-season crops are ranked above. High crowding in Brgy. {{barangay}} warns of possible oversupply."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Total planted",
     "activeFarmers": "Reporting farmers",
     "barangayBreakdown": "Barangay breakdown"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "signInExisting": "Sign in to existing account",
+    "createAccount": "Create an account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "New to Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Good window — ready for field prep",
+    "goDesc": "Sentinel-1 radar shows balanced surface moisture ({{pct}}%). Clear light weeds and begin planting within this window.",
+    "waitHeadline": "Wait 2–3 days & check drainage",
+    "waitDesc": "Sentinel-1 radar shows wet surface soil ({{pct}}%) after recent rain. Clear field ditches and check for standing water before sowing.",
+    "avoidHeadline": "Hold off — high waterlogging risk",
+    "avoidDesc": "Surface soil is heavily saturated ({{pct}}%). Wait for standing water to drain before land preparation to protect roots."
+  },
+  "window": {
+    "edgeUncertainty": "Window edges carry ±2 day uncertainty",
+    "rainOutlook": "7-day rain outlook",
+    "soilMoisture": "Surface soil moisture",
+    "drainageBaseline": "Drainage baseline",
+    "dataType": "Data type",
+    "whyTitle": "Why this planting window?",
+    "whyRadarTitle": "Cloud-piercing radar (Sentinel-1)",
+    "whyRadarBody": "Measures surface soil wetness even during cloudy Leyte weeks.",
+    "whyWeatherTitle": "Downscaled weather (PAGASA + ERA5)",
+    "whyWeatherBody": "Adjusted with 30 m elevation slope from Mount Pangasugan to coastal lowlands.",
+    "whyFarmerTitle": "Farmer check-ins",
+    "whyFarmerBody": "Recalibrated weekly using Baybay City rain reports and harvest logs.",
+    "disputeSoilDrier": "Soil is drier here",
+    "disputeSoilWetter": "Field is flooded",
+    "disputeRainMismatch": "Rain did not match",
+    "disputeTiming": "Timing feels off",
+    "disputeNotePlaceholder": "Optional note for Baybay CAO technician..."
   }
 }

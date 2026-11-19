@@ -42,8 +42,8 @@ export function LoginPage() {
           <ArrowLeft size={20} />
         </button>
         <div>
-          <p className="text-xs font-semibold text-[var(--sub)]">Agapay Account</p>
-          <h1 className="text-2xl font-bold text-[var(--ink)]">Sign in</h1>
+          <p className="text-xs font-semibold text-[var(--sub)]">{t('auth.accountSub')}</p>
+          <h1 className="text-2xl font-bold text-[var(--ink)]">{t('auth.signIn')}</h1>
         </div>
       </header>
 
@@ -73,7 +73,7 @@ export function LoginPage() {
             htmlFor="login-email"
             className="block text-xs font-bold uppercase tracking-wider text-[var(--sub)]"
           >
-            Email address
+            {t('auth.emailLabel')}
           </label>
           <input
             id="login-email"
@@ -92,7 +92,7 @@ export function LoginPage() {
             htmlFor="login-password"
             className="block text-xs font-bold uppercase tracking-wider text-[var(--sub)]"
           >
-            Password
+            {t('auth.passwordLabel')}
           </label>
           <input
             id="login-password"
@@ -120,14 +120,14 @@ export function LoginPage() {
           className="flex min-h-[54px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-base font-bold text-[var(--on-accent)] shadow-sm transition disabled:opacity-50"
         >
           {loading ? <Loader2 size={19} className="animate-spin" /> : <LogIn size={19} />}
-          <span>{loading ? 'Signing in...' : 'Sign in'}</span>
+          <span>{loading ? t('auth.signingIn') : t('auth.signIn')}</span>
         </button>
       </form>
 
       <p className="mt-5 text-center text-sm text-[var(--sub)]">
-        New to Agapay?{' '}
+        {t('auth.newToAgapay')}{' '}
         <Link to="/onboarding" className="font-bold text-[var(--accent)] underline">
-          Create an account
+          {t('auth.createAccount')}
         </Link>
       </p>
     </MobileShell>

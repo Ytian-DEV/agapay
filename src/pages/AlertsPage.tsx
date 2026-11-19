@@ -60,6 +60,20 @@ export function AlertsPage() {
     }
   };
 
+  const localizedAlertTitle = (alert: RiskAlert) => {
+    if (alert.category === 'heavy_rain') return t('alerts.catHeavyRainTitle');
+    if (alert.category === 'waterlogging') return t('alerts.catWaterloggingTitle');
+    if (alert.category === 'dry_spell') return t('alerts.catDrySpellTitle');
+    return t('alerts.catWindowTitle');
+  };
+
+  const localizedAlertAction = (alert: RiskAlert) => {
+    if (alert.category === 'heavy_rain') return t('alerts.catHeavyRainAction');
+    if (alert.category === 'waterlogging') return t('alerts.catWaterloggingAction');
+    if (alert.category === 'dry_spell') return t('alerts.catDrySpellAction');
+    return t('alerts.catWindowAction');
+  };
+
   const handleFlagAlert = async (alert: RiskAlert) => {
     await submitDispute({
       barangay_id: barangay.id,
@@ -129,10 +143,10 @@ export function AlertsPage() {
                   </span>
                   <div>
                     <p className="text-[15px] font-bold leading-snug text-[var(--ink)]">
-                      {alert.title}
+                      {localizedAlertTitle(alert)}
                     </p>
                     <p className="mt-0.5 text-xs font-medium text-[var(--sub)]">
-                      {alert.action_summary}
+                      {localizedAlertAction(alert)}
                     </p>
                   </div>
                 </div>
@@ -213,10 +227,10 @@ export function AlertsPage() {
             </div>
 
             <h2 className="mt-3 text-xl font-bold text-[var(--ink)]">
-              {selectedAlert.title}
+              {localizedAlertTitle(selectedAlert)}
             </h2>
             <p className="mt-1 text-sm font-semibold text-[var(--accent)]">
-              Action: {selectedAlert.action_summary}
+              {localizedAlertAction(selectedAlert)}
             </p>
             <p className="mt-3 text-sm leading-relaxed text-[var(--sub)]">
               {selectedAlert.detail_explanation}

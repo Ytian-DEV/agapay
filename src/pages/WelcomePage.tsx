@@ -93,7 +93,7 @@ export function WelcomePage() {
                 className="flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)]/95 px-5 text-[15px] font-bold text-[var(--ink)] backdrop-blur-xs transition hover:border-[var(--accent)]"
               >
                 <LogIn size={17} className="text-[var(--accent)]" />
-                <span>Sign in to existing account</span>
+                <span>{t('auth.signInExisting')}</span>
               </button>
             </>
           )}

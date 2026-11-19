@@ -17,7 +17,7 @@ import type { RecommendationDispute } from '../types/database';
 
 const WINDOW_DAYS = Array.from({ length: 21 }, (_, idx) => ({
   dayIndex: idx,
-  inWindow: idx >= 7 && idx <= 15, // Nov 20 – 28 inside Nov 13 – Dec 3
+  inWindow: idx >= 7 && idx <= 15,
 }));
 
 export function PlantingWindowPage() {
@@ -36,6 +36,20 @@ export function PlantingWindowPage() {
     useState<RecommendationDispute['reason']>('soil_drier');
   const [disputeNote, setDisputeNote] = useState('');
   const [disputeSent, setDisputeSent] = useState(false);
+
+  const localizedHeadline =
+    advisory.decision === 'go'
+      ? t('advisory.goHeadline')
+      : advisory.decision === 'avoid'
+      ? t('advisory.avoidHeadline')
+      : t('advisory.waitHeadline');
+
+  const localizedExplanation =
+    advisory.decision === 'go'
+      ? t('advisory.goDesc', { pct: advisory.soil_moisture_pct })
+      : advisory.decision === 'avoid'
+      ? t('advisory.avoidDesc', { pct: advisory.soil_moisture_pct })
+      : t('advisory.waitDesc', { pct: advisory.soil_moisture_pct });
 
   const handleDisputeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +77,7 @@ export function PlantingWindowPage() {
         </button>
         <div>
           <p className="text-xs font-semibold text-[var(--sub)]">
-            {crop.name} · {barangay.municipality}
+            {crop.name} ({crop.local_name}) · {barangay.municipality}
           </p>
           <h1 className="text-2xl font-bold text-[var(--ink)]">{advisory.window_label}</h1>
         </div>
@@ -75,7 +89,7 @@ export function PlantingWindowPage() {
       </p>
 
       <div className="space-y-3.5 pb-6">
-        {/* 21-day visual planting window bar (Figma 13 Planting window) */}
+        {/* 21-day visual planting window bar */}
         <section className="ag-card p-4">
           <div className="flex h-16 items-end justify-between gap-1">
             {WINDOW_DAYS.map((d) => (
@@ -101,13 +115,11 @@ export function PlantingWindowPage() {
                   : t('common.confidenceMedium')
               }
             />
-            <span className="text-xs text-[var(--muted)]">
-              Window edges carry ±2 day uncertainty
-            </span>
+            <span className="text-xs text-[var(--muted)]">{t('window.edgeUncertainty')}</span>
           </div>
         </section>
 
-        {/* Action Recommendation Card */}
+        {/* Localized Action Recommendation Card */}
         <section className="ag-card p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <StatusPill variant={advisory.decision} size="md" />
@@ -118,37 +130,39 @@ export function PlantingWindowPage() {
               </span>
             )}
           </div>
-          <h2 className="mt-3 text-xl font-bold text-[var(--ink)]">{advisory.headline}</h2>
+          <h2 className="mt-3 text-xl font-bold text-[var(--ink)]">{localizedHeadline}</h2>
           <p className="mt-1.5 text-sm leading-relaxed text-[var(--sub)]">
-            {advisory.plain_explanation}
+            {localizedExplanation}
           </p>
         </section>
 
-        {/* Key Indicators Table */}
+        {/* Localized Key Indicators Table */}
         <section className="ag-card divide-y divide-[var(--border)] text-sm">
           <div className="flex items-center justify-between px-4 py-3.5">
-            <span className="text-[var(--sub)]">7-day rain outlook</span>
-            <span className="font-bold text-[var(--ink)]">{advisory.rain_7d_mm} mm (moderate)</span>
+            <span className="text-[var(--sub)]">{t('window.rainOutlook')}</span>
+            <span className="font-bold text-[var(--ink)]">
+              {advisory.rain_7d_mm} mm ({t('status.medium').toLowerCase()})
+            </span>
           </div>
           <div className="flex items-center justify-between px-4 py-3.5">
-            <span className="text-[var(--sub)]">Surface soil moisture</span>
+            <span className="text-[var(--sub)]">{t('window.soilMoisture')}</span>
             <span className="font-bold text-[var(--ink)]">
               {advisory.soil_moisture_pct}% (Sentinel-1 SAR)
             </span>
           </div>
           <div className="flex items-center justify-between px-4 py-3.5">
-            <span className="text-[var(--sub)]">Drainage baseline</span>
+            <span className="text-[var(--sub)]">{t('window.drainageBaseline')}</span>
             <span className="font-bold capitalize text-[var(--ink)]">
               {barangay.drainage_class.replace('_', ' ')} ({barangay.soil_texture})
             </span>
           </div>
           <div className="flex items-center justify-between px-4 py-3.5">
-            <span className="text-[var(--sub)]">Data type</span>
+            <span className="text-[var(--sub)]">{t('window.dataType')}</span>
             <span className="font-bold text-[var(--ink)]">{t('common.modeled')}</span>
           </div>
         </section>
 
-        {/* Decision Explanation Expandable Section */}
+        {/* Localized Decision Explanation Section */}
         <section className="ag-card overflow-hidden">
           <button
             type="button"
@@ -157,32 +171,32 @@ export function PlantingWindowPage() {
           >
             <span className="flex items-center gap-2 text-[15px] font-bold text-[var(--accent)]">
               <Satellite size={18} />
-              Why this planting window?
+              {t('window.whyTitle')}
             </span>
             {showWhy ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </button>
 
           {showWhy && (
             <div className="space-y-2.5 border-t border-[var(--border)] px-4 py-3.5 text-sm leading-relaxed text-[var(--sub)]">
-              <ul className="list-disc space-y-1.5 pl-4">
+              <ul className="list-disc space-y-2 pl-4">
                 <li>
-                  <strong className="text-[var(--ink)]">Cloud-piercing radar (Sentinel-1):</strong>{' '}
-                  Measures surface soil wetness even during cloudy Leyte weeks.
+                  <strong className="text-[var(--ink)]">{t('window.whyRadarTitle')}:</strong>{' '}
+                  {t('window.whyRadarBody')}
                 </li>
                 <li>
-                  <strong className="text-[var(--ink)]">Downscaled weather (PAGASA + ERA5):</strong>{' '}
-                  Adjusted with 30 m elevation slope from Mount Pangasugan to coastal lowlands.
+                  <strong className="text-[var(--ink)]">{t('window.whyWeatherTitle')}:</strong>{' '}
+                  {t('window.whyWeatherBody')}
                 </li>
                 <li>
-                  <strong className="text-[var(--ink)]">Farmer check-ins:</strong> Recalibrated
-                  weekly using Baybay City rain reports and harvest logs.
+                  <strong className="text-[var(--ink)]">{t('window.whyFarmerTitle')}:</strong>{' '}
+                  {t('window.whyFarmerBody')}
                 </li>
               </ul>
             </div>
           )}
         </section>
 
-        {/* Accountability: Dispute or Flag Advisory (PDF Day 6 Ethics) */}
+        {/* Localized Accountability Dispute Form */}
         {disputeSent ? (
           <div className="status-go flex items-center gap-2.5 rounded-2xl p-4 text-sm font-semibold">
             <CheckCircle2 size={18} className="shrink-0" />
@@ -205,10 +219,10 @@ export function PlantingWindowPage() {
             <div className="grid grid-cols-2 gap-2">
               {(
                 [
-                  ['soil_drier', 'Soil is drier here'],
-                  ['soil_wetter', 'Field is flooded'],
-                  ['rain_mismatch', 'Rain did not match'],
-                  ['crop_timing', 'Timing feels off'],
+                  ['soil_drier', t('window.disputeSoilDrier')],
+                  ['soil_wetter', t('window.disputeSoilWetter')],
+                  ['rain_mismatch', t('window.disputeRainMismatch')],
+                  ['crop_timing', t('window.disputeTiming')],
                 ] as const
               ).map(([value, label]) => (
                 <button
@@ -229,7 +243,7 @@ export function PlantingWindowPage() {
               rows={2}
               value={disputeNote}
               onChange={(e) => setDisputeNote(e.target.value)}
-              placeholder="Optional note for Baybay CAO technician..."
+              placeholder={t('window.disputeNotePlaceholder')}
               className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
             />
             <div className="flex gap-2">

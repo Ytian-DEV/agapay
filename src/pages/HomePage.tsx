@@ -162,10 +162,18 @@ export function HomePage() {
           </div>
 
           <h3 className="mt-3 text-lg font-bold leading-snug text-[var(--ink)]">
-            {advisory.headline}
+            {advisory.decision === 'go'
+              ? t('advisory.goHeadline')
+              : advisory.decision === 'avoid'
+              ? t('advisory.avoidHeadline')
+              : t('advisory.waitHeadline')}
           </h3>
           <p className="mt-1 text-sm leading-relaxed text-[var(--sub)]">
-            {advisory.plain_explanation}
+            {advisory.decision === 'go'
+              ? t('advisory.goDesc', { pct: advisory.soil_moisture_pct })
+              : advisory.decision === 'avoid'
+              ? t('advisory.avoidDesc', { pct: advisory.soil_moisture_pct })
+              : t('advisory.waitDesc', { pct: advisory.soil_moisture_pct })}
           </p>
 
           <p className="mt-3 text-xs text-[var(--muted)]">
@@ -201,13 +209,13 @@ export function HomePage() {
               <p className="text-xs font-semibold text-[var(--sub)]">{t('home.waterlogging')}</p>
               <p className="mt-0.5 text-xl font-bold text-[var(--ink)]">
                 {advisory.waterlogging_status === 'low'
-                  ? 'Low risk'
+                  ? t('home.waterloggingLow')
                   : advisory.waterlogging_status === 'high'
-                  ? 'High risk'
-                  : 'Check field'}
+                  ? t('home.waterloggingHigh')
+                  : t('home.waterloggingCheck')}
               </p>
               <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-                Soil {advisory.soil_moisture_pct}% wet
+                {t('home.soilWet', { pct: advisory.soil_moisture_pct })}
               </p>
             </div>
           </Link>
