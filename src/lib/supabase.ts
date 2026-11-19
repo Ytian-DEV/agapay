@@ -13,6 +13,7 @@ import type {
   RiskAlert,
   UserConsent,
 } from '../types/database';
+import { CROPS as SEED_CROPS } from '../data/seedData';
 
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
@@ -237,41 +238,51 @@ export async function fetchReferenceData(): Promise<DbResult<ReferenceBundle>> {
       guideByCropId.set(g.crop_id, g);
     }
 
-    const suitabilityMap: Record<string, number> = {
-      'sweet-potato': 86,
-      rice: 81,
-      corn: 78,
-      cassava: 74,
-      coconut: 70,
-    };
+    const seedBySlug = new Map(SEED_CROPS.map((s) => [s.slug, s]));
+    const dbCropBySlug = new Map<string, Crop>();
 
-    const crops: Crop[] = (cropsRes.data ?? [])
-      .filter((c) => c.slug !== 'coconut')
-      .map((c) => {
-        const g = guideByCropId.get(c.id);
-        return {
-          id: c.id,
-          slug: c.slug,
-          name: c.name,
-          local_name: c.local_name,
-          category: c.category,
-          duration_days: Number(c.duration_days),
-          water_need: c.water_need,
-          cost_tier: c.cost_tier,
-          flood_risk: c.flood_risk,
-          typical_yield_min_sacks: Number(c.typical_yield_min_sacks),
-          typical_yield_max_sacks: Number(c.typical_yield_max_sacks),
-          suitability_pct: suitabilityMap[c.slug] ?? 75,
-          best_soil_moisture: (g?.best_soil_moisture_pct as string) ?? '30% – 45%',
-          planting_steps: Array.isArray(g?.planting_steps)
+    for (const c of cropsRes.data ?? []) {
+      const g = guideByCropId.get(c.id);
+      const seed = seedBySlug.get(c.slug);
+      dbCropBySlug.set(c.slug, {
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        local_name: c.local_name,
+        category: c.category,
+        duration_days: Number(c.duration_days),
+        water_need: c.water_need,
+        cost_tier: c.cost_tier,
+        flood_risk: c.flood_risk,
+        typical_yield_min_sacks: Number(c.typical_yield_min_sacks),
+        typical_yield_max_sacks: Number(c.typical_yield_max_sacks),
+        suitability_pct: seed?.suitability_pct ?? 78,
+        planting_season: c.planting_season ?? seed?.planting_season ?? 'wet_and_dry',
+        best_planting_months:
+          Array.isArray(c.best_planting_months) && c.best_planting_months.length > 0
+            ? (c.best_planting_months as number[])
+            : seed?.best_planting_months ?? [5, 6, 10, 11],
+        season_note: c.season_note ?? seed?.season_note ?? 'Check local rainfall & drainage.',
+        best_soil_moisture:
+          (g?.best_soil_moisture_pct as string) ?? seed?.best_soil_moisture ?? '30% – 45%',
+        planting_steps:
+          Array.isArray(g?.planting_steps) && (g.planting_steps as string[]).length > 0
             ? (g.planting_steps as string[])
-            : [],
-          drainage_tip: (g?.drainage_and_wet_tip as string) ?? '',
-          varieties: Array.isArray(g?.recommended_varieties)
+            : seed?.planting_steps ?? [],
+        drainage_tip:
+          (g?.drainage_and_wet_tip as string) ?? seed?.drainage_tip ?? '',
+        varieties:
+          Array.isArray(g?.recommended_varieties) && (g.recommended_varieties as string[]).length > 0
             ? (g.recommended_varieties as string[])
-            : ['Local certified'],
-        };
+            : seed?.varieties ?? ['Local certified'],
       });
+    }
+
+    // Merge all 20 Philippine crops so users always see the full PH catalog even before running the migration
+    const crops: Crop[] = [
+      ...Array.from(dbCropBySlug.values()),
+      ...SEED_CROPS.filter((s) => !dbCropBySlug.has(s.slug)),
+    ];
 
     const cropById = new Map<string, Crop>();
     for (const c of crops) cropById.set(c.id, c);

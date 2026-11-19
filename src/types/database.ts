@@ -50,12 +50,24 @@ export interface Barangay {
   dominant_crop_slug: string;
 }
 
+export type CropCategory =
+  | 'rice'
+  | 'corn'
+  | 'root_crop'
+  | 'vegetable'
+  | 'legume'
+  | 'fruit'
+  | 'tree_crop'
+  | 'fiber';
+
+export type PlantingSeasonType = 'wet' | 'dry' | 'wet_and_dry' | 'year_round';
+
 export interface Crop {
   id: string;
-  slug: 'corn' | 'rice' | 'sweet-potato' | 'cassava' | 'coconut';
+  slug: string;
   name: string;
   local_name: string;
-  category: 'rice' | 'corn' | 'root_crop' | 'tree_crop';
+  category: CropCategory;
   duration_days: number;
   water_need: 'low' | 'medium' | 'high';
   cost_tier: 'low' | 'medium' | 'high';
@@ -63,6 +75,9 @@ export interface Crop {
   typical_yield_min_sacks: number;
   typical_yield_max_sacks: number;
   suitability_pct: number;
+  planting_season: PlantingSeasonType;
+  best_planting_months: number[]; // 1..12
+  season_note: string;
   best_soil_moisture: string;
   planting_steps: string[];
   drainage_tip: string;

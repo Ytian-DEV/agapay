@@ -20,13 +20,17 @@ export function YieldEstimatePage() {
   const barangay =
     barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
 
-  const scaleMin = crop.slug === 'corn' ? 30 : crop.slug === 'rice' ? 50 : 80;
-  const scaleMax = crop.slug === 'corn' ? 80 : crop.slug === 'rice' ? 115 : 175;
-  const leftPct = ((crop.typical_yield_min_sacks - scaleMin) / (scaleMax - scaleMin)) * 100;
-  const widthPct =
-    ((crop.typical_yield_max_sacks - crop.typical_yield_min_sacks) /
-      (scaleMax - scaleMin)) *
-    100;
+  const scaleMin = Math.max(5, Math.floor(crop.typical_yield_min_sacks * 0.6));
+  const scaleMax = Math.ceil(crop.typical_yield_max_sacks * 1.35);
+  const leftPct = Math.max(
+    0,
+    Math.min(100, ((crop.typical_yield_min_sacks - scaleMin) / (scaleMax - scaleMin)) * 100)
+  );
+  const widthPct = Math.max(
+    8,
+    ((crop.typical_yield_max_sacks - crop.typical_yield_min_sacks) / (scaleMax - scaleMin)) *
+      100
+  );
 
   const totalMin = Math.round(crop.typical_yield_min_sacks * activeParcel.area_ha);
   const totalMax = Math.round(crop.typical_yield_max_sacks * activeParcel.area_ha);
