@@ -1,0 +1,19 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="161.417" height="153.042" viewBox="0 0 161.417 153.042" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Mountain_Layers">
+<path id="Sky_Cream" d="M80.7083 140C119.368 140 150.708 108.66 150.708 70C150.708 31.3401 119.368 0 80.7083 0C42.0484 0 10.7083 31.3401 10.7083 70C10.7083 108.66 42.0484 140 80.7083 140Z" fill="#F3ECD5"/>
+<path id="Range_Pine_Back" d="M1.375 72.3333L34.0417 49L52.7083 59.5L83.0416 32.6667L118.042 59.5L136.708 52.5L160.042 70V149.333H1.375V72.3333Z" fill="#527853" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+<g id="Range_Sage_Mid">
+<path id="Peak_Sage_Left" d="M3.70833 112L29.375 79.3333L57.375 100.333L41.0416 135.333H3.70833V112Z" fill="#9EAE8B" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+<path id="Peak_Sage_Right" d="M99.375 100.333L125.042 79.3333L155.375 105L146.042 140H99.375V100.333Z" fill="#9EAE8B" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+<path id="Peak_Sage_Center" d="M29.375 137.667L73.7084 67.6667L113.375 102.667L132.042 144.667H29.375V137.667Z" fill="#9EAE8B" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+<path id="Peak_Sage_Facet_Line" d="M73.7083 67.6667L99.375 128.333" stroke-width="2.42" stroke-linecap="round" stroke="#2E4234"/>
+</g>
+<g id="Range_Earth_Foreground">
+<path id="Slope_Umber_Left" d="M8.375 126L25.875 98L69.0417 137.667L38.7083 151.667L8.375 140V126Z" fill="#634B3E" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+<path id="Slope_Umber_Facet_Left" d="M29.375 79.3333L17.7083 130.667" stroke-width="2.34" stroke-linecap="round" stroke="#2E4234"/>
+<path id="Slope_Umber_Right" d="M85.3751 121.333L125.042 105L148.375 133L111.042 151.667L85.3751 137.667V121.333Z" fill="#634B3E" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+<path id="Slope_Umber_Facet_Right" d="M125.042 79.3333L105.208 124.833" stroke-width="2.34" stroke-linecap="round" stroke="#2E4234"/>
+<path id="Peak_Sandstone_Center" d="M38.7083 147L79.5417 101.5L120.375 147H38.7083Z" fill="#A68164" stroke-width="2.75" stroke-linejoin="round" stroke="#2E4234"/>
+</g>
+</g>
+</svg>

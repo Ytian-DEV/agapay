@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+:root {
+  /* Core Agapay palette (aligned with Figma BukidTech / Agapay tokens) */
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --surface-muted: #edf0e9;
+  --glass: rgba(255, 255, 255, 0.84);
+  --border: #dfe4da;
+  --ink: #111312;
+  --sub: #4f554e;
+  --muted: #697067;
+
+  /* Brand greens & earth tones */
+  --accent: #3a5a40;
+  --accent-deep: #344e41;
+  --accent-bright: #1f7a4d;
+  --accent-sage: #588157;
+  --accent-soft: #e6efe3;
+  --stone: #dad7cd;
+  --earth: #6c584c;
+  --on-accent: #ffffff;
+
+  /* High-contrast outdoor sunlight semantic status tokens */
+  --go-bg: #e1f3e5;
+  --go-border: #2c7a4b;
+  --go-text: #164f2d;
+
+  --wait-bg: #fef1d6;
+  --wait-border: #b86e00;
+  --wait-text: #744400;
+
+  --avoid-bg: #fde6e2;
+  --avoid-border: #c53929;
+  --avoid-text: #861d12;
+
+  --info-bg: #e5eff8;
+  --info-border: #2b6cb0;
+  --info-text: #1c4c80;
+
+  /* Safe-area variables (iOS / Android / Capacitor ready) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+.dark {
+  --bg: #0d100e;
+  --surface: #181d1a;
+  --surface-muted: #222925;
+  --glass: rgba(24, 29, 26, 0.88);
+  --border: #2c352f;
+  --ink: #f2f4f0;
+  --sub: #aeb7ac;
+  --muted: #8a9488;
+
+  --accent: #4fb67f;
+  --accent-deep: #3a9665;
+  --accent-bright: #5cca8f;
+  --accent-sage: #7ec49b;
+  --accent-soft: #1a3727;
+  --stone: #303731;
+  --earth: #d6b69d;
+  --on-accent: #0b110d;
+
+  --go-bg: #153524;
+  --go-border: #4fb67f;
+  --go-text: #95e8ba;
+
+  --wait-bg: #3b2d10;
+  --wait-border: #e3b05a;
+  --wait-text: #fbd68d;
+
+  --avoid-bg: #3f1b18;
+  --avoid-border: #ef6c60;
+  --avoid-text: #ffb6ae;
+
+  --info-bg: #162c42;
+  --info-border: #6fa8e8;
+  --info-text: #b2d4fa;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+  min-height: 100dvh;
+}
+
+.font-brand {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+/* Safe-area spacing utilities */
+.pt-safe {
+  padding-top: max(12px, var(--safe-top));
+}
+
+.pb-safe {
+  padding-bottom: max(16px, var(--safe-bottom));
+}
+
+.px-safe {
+  padding-left: max(16px, var(--safe-left));
+  padding-right: max(16px, var(--safe-right));
+}
+
+/* Farmer-first accessible touch target baseline (minimum 48px) */
+.tap-target {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* High-contrast focus ring for keyboard & accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Clean card elevation */
+.ag-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 2px 10px rgba(17, 19, 18, 0.04);
+}
+
+.dark .ag-card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+}
+
+/* Status pills (high contrast in direct sunlight) */
+.status-go {
+  background-color: var(--go-bg);
+  color: var(--go-text);
+  border: 1.5px solid var(--go-border);
+}
+
+.status-wait {
+  background-color: var(--wait-bg);
+  color: var(--wait-text);
+  border: 1.5px solid var(--wait-border);
+}
+
+.status-avoid {
+  background-color: var(--avoid-bg);
+  color: var(--avoid-text);
+  border: 1.5px solid var(--avoid-border);
+}
+
+.status-info {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+  border: 1.5px solid var(--info-border);
+}
+
+/* Print styling for LGU Reports */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111312 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
