@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   ChevronRight,
   CloudRain,
@@ -12,6 +13,9 @@ import {
 import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
+import { StaggerGroup, StaggerItem } from '../components/MotionPrimitives';
+import { MapPanelSkeleton } from '../components/AgapaySkeletons';
+import { TACTILE_TAP } from '../lib/motion';
 import {
   BaybayForecastMap,
   buildBarangayZones,
@@ -23,7 +27,7 @@ import { useTheme } from '../context/ThemeContext';
 export function MapPage() {
   const { t } = useTranslation();
   const { resolved } = useTheme();
-  const { barangays, crops, activeParcel, lastSyncedAt, isOnline } = useAppState();
+  const { authLoading, barangays, crops, activeParcel, lastSyncedAt, isOnline } = useAppState();
 
   const [layer, setLayer] = useState<ForecastLayer>('suitability');
   const [flyTrigger, setFlyTrigger] = useState(0);
@@ -78,11 +82,12 @@ export function MapPage() {
             const Icon = item.icon;
             const active = item.id === layer;
             return (
-              <button
+              <motion.button
                 key={item.id}
                 role="tab"
                 type="button"
                 aria-selected={active}
+                whileTap={TACTILE_TAP}
                 onClick={() => setLayer(item.id)}
                 className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-1 text-[11px] font-bold transition ${
                   active
@@ -92,7 +97,7 @@ export function MapPage() {
               >
                 <Icon size={14} />
                 <span>{item.label}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -119,6 +124,11 @@ export function MapPage() {
       </div>
 
       {/* Real Interactive MapLibre GL Map synced to Rain / Soil / Flood / Suitability */}
+      {authLoading ? (
+        <MapPanelSkeleton />
+      ) : (
+      <StaggerGroup>
+      <StaggerItem>
       <BaybayForecastMap
         zones={zones}
         selectedBarangayId={selectedZone.barangayId}
@@ -131,6 +141,7 @@ export function MapPage() {
         isOnline={isOnline}
         flyToTrigger={flyTrigger}
       />
+      </StaggerItem>
 
       {/* Dynamic Legend for Active Forecast Layer */}
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] font-bold">
@@ -173,6 +184,7 @@ export function MapPage() {
       </div>
 
       {/* Selected Zone Detail Card */}
+      <StaggerItem>
       <section className="ag-card mt-3 p-4">
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -229,6 +241,9 @@ export function MapPage() {
           <ChevronRight size={18} />
         </Link>
       </section>
+      </StaggerItem>
+      </StaggerGroup>
+      )}
     </MobileShell>
   );
 }

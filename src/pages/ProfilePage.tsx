@@ -13,10 +13,13 @@ import {
   MapPinned,
   Moon,
   ShieldCheck,
+  Sparkles,
   Sun,
 } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { StaggerGroup, StaggerItem } from '../components/MotionPrimitives';
+import { replayAgapaySplash } from '../components/SplashScreen';
 import { useAppState } from '../context/AppStateContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -66,7 +69,8 @@ export function ProfilePage() {
         </h1>
       </header>
 
-      <div className="space-y-4">
+      <StaggerGroup className="space-y-4">
+        <StaggerItem>
         {/* Supabase Account Connection Status Banner */}
         {isAuthenticated && authUser ? (
           <div className="status-go flex items-center justify-between gap-2 rounded-2xl px-4 py-3 text-xs font-bold">
@@ -238,6 +242,22 @@ export function ProfilePage() {
             </div>
             <ChevronRight size={17} className="text-[var(--sub)]" />
           </Link>
+
+          <button
+            type="button"
+            onClick={replayAgapaySplash}
+            className="flex min-h-[56px] w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[var(--surface-muted)]"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+                <Sparkles size={18} />
+              </span>
+              <span className="text-[15px] font-semibold text-[var(--ink)]">
+                Replay opening animation
+              </span>
+            </div>
+            <ChevronRight size={17} className="text-[var(--sub)]" />
+          </button>
         </section>
 
         {/* Log Out Button */}
@@ -249,7 +269,8 @@ export function ProfilePage() {
           <LogOut size={18} />
           <span>{t('profile.logout')}</span>
         </button>
-      </div>
+        </StaggerItem>
+      </StaggerGroup>
 
       {/* Log Out Confirmation Modal */}
       {confirmLogout && (

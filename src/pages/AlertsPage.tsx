@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   CheckCircle2,
   CloudRain,
@@ -13,12 +14,15 @@ import {
 import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
+import { StaggerGroup, StaggerItem } from '../components/MotionPrimitives';
+import { AlertsListSkeleton } from '../components/AgapaySkeletons';
+import { TACTILE_TAP, WOVEN_EASE } from '../lib/motion';
 import { useAppState } from '../context/AppStateContext';
 import type { RiskAlert } from '../types/database';
 
 export function AlertsPage() {
   const { t } = useTranslation();
-  const { barangays, alerts, activeParcel, profile, updateProfile, submitDispute } =
+  const { authLoading, barangays, alerts, activeParcel, profile, updateProfile, submitDispute } =
     useAppState();
 
   const [tab, setTab] = useState<'current' | 'history'>('current');
@@ -118,6 +122,11 @@ export function AlertsPage() {
       </div>
 
       {/* Alerts List */}
+      {authLoading ? (
+        <AlertsListSkeleton />
+      ) : (
+      <StaggerGroup>
+      <StaggerItem>
       <section className="ag-card divide-y divide-[var(--border)] overflow-hidden">
         {list.length === 0 ? (
           <div className="p-6 text-center text-sm text-[var(--sub)]">
@@ -127,9 +136,10 @@ export function AlertsPage() {
           list.map((alert) => {
             const Icon = getCategoryIcon(alert.category);
             return (
-              <button
+              <motion.button
                 key={alert.id}
                 type="button"
+                whileTap={TACTILE_TAP}
                 onClick={() => setSelectedAlert(alert)}
                 className="flex min-h-[76px] w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-[var(--surface-muted)]"
               >
@@ -151,11 +161,14 @@ export function AlertsPage() {
                   </div>
                 </div>
                 <StatusPill variant={alert.severity} />
-              </button>
+              </motion.button>
             );
           })
         )}
       </section>
+      </StaggerItem>
+      </StaggerGroup>
+      )}
 
       {/* SMS Backup Delivery Toggle (Figma 04 Alerts bottom section) */}
       <section className="ag-card mt-4 p-4">
@@ -201,15 +214,24 @@ export function AlertsPage() {
         </Link>
       </section>
 
-      {/* Alert Detail Bottom Sheet Modal */}
+      {/* Alert Detail Bottom Sheet Modal (GPU spring slide + fade) */}
+      <AnimatePresence>
       {selectedAlert && (
-        <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
           onClick={() => setSelectedAlert(null)}
         >
-          <div
+          <motion.div
+            initial={{ y: 36, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 24, opacity: 0 }}
+            transition={{ duration: 0.3, ease: WOVEN_EASE }}
             className="w-full max-w-md rounded-t-[28px] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-2xl sm:rounded-[28px]"
             style={{ paddingBottom: 'max(20px, var(--safe-bottom))' }}
             onClick={(e) => e.stopPropagation()}
@@ -260,9 +282,10 @@ export function AlertsPage() {
                 </button>
               )}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </MobileShell>
   );
 }

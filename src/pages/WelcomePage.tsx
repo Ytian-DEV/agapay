@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Building2,
@@ -11,6 +12,8 @@ import {
 } from 'lucide-react';
 import { AgapayLogo } from '../components/AgapayLogo';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { PageTransition, StaggerGroup, StaggerItem } from '../components/MotionPrimitives';
+import { TACTILE_TAP } from '../lib/motion';
 import { useTheme } from '../context/ThemeContext';
 import { useAppState } from '../context/AppStateContext';
 
@@ -30,7 +33,7 @@ export function WelcomePage() {
         className="pointer-events-none absolute inset-x-0 bottom-0 mx-auto w-full max-w-lg select-none opacity-65 dark:opacity-20"
       />
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-md flex-col justify-between px-5 pt-safe pb-safe">
+      <PageTransition className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-md flex-col justify-between px-5 pt-safe pb-safe">
         {/* Top bar: Language switcher + Dark/Light toggle */}
         <header className="flex items-center justify-between pt-2">
           <LanguageSwitcher variant="pill" />
@@ -66,48 +69,60 @@ export function WelcomePage() {
         </section>
 
         {/* Bottom Primary & Secondary Actions */}
-        <footer className="space-y-2.5 pb-3">
+        <StaggerGroup className="space-y-2.5 pb-3">
           {isAuthenticated ? (
-            <button
+            <StaggerItem>
+            <motion.button
               type="button"
+              whileTap={TACTILE_TAP}
               onClick={() => navigate('/home')}
-              className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-6 text-[17px] font-semibold text-[var(--on-accent)] shadow-md transition active:scale-[0.99] hover:bg-[var(--accent-deep)]"
+              className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-6 text-[17px] font-semibold text-[var(--on-accent)] shadow-md transition hover:bg-[var(--accent-deep)]"
             >
               <span>{t('onboarding.goToHome')}</span>
               <ArrowRight size={20} />
-            </button>
+            </motion.button>
+            </StaggerItem>
           ) : (
             <>
-              <button
+              <StaggerItem>
+              <motion.button
                 type="button"
+                whileTap={TACTILE_TAP}
                 onClick={() => navigate('/onboarding')}
-                className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-6 text-[17px] font-semibold text-[var(--on-accent)] shadow-md transition active:scale-[0.99] hover:bg-[var(--accent-deep)]"
+                className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-6 text-[17px] font-semibold text-[var(--on-accent)] shadow-md transition hover:bg-[var(--accent-deep)]"
               >
                 <span>{t('welcome.getStarted')}</span>
                 <ArrowRight size={20} />
-              </button>
+              </motion.button>
+              </StaggerItem>
 
-              <button
+              <StaggerItem>
+              <motion.button
                 type="button"
+                whileTap={TACTILE_TAP}
                 onClick={() => navigate('/login')}
                 className="flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)]/95 px-5 text-[15px] font-bold text-[var(--ink)] backdrop-blur-xs transition hover:border-[var(--accent)]"
               >
                 <LogIn size={17} className="text-[var(--accent)]" />
                 <span>{t('auth.signInExisting')}</span>
-              </button>
+              </motion.button>
+              </StaggerItem>
             </>
           )}
 
-          <button
+          <StaggerItem>
+          <motion.button
             type="button"
+            whileTap={TACTILE_TAP}
             onClick={() => navigate('/sms-preview')}
             className="flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold text-[var(--earth)] transition hover:bg-[var(--surface-muted)]"
           >
             <MessageSquareText size={18} />
             <span>{t('welcome.useSms')}</span>
-          </button>
+          </motion.button>
+          </StaggerItem>
 
-          <div className="flex items-center justify-center gap-4 pt-0.5 text-center">
+          <StaggerItem className="flex items-center justify-center gap-4 pt-0.5 text-center">
             <button
               type="button"
               onClick={() => navigate('/lgu')}
@@ -126,9 +141,9 @@ export function WelcomePage() {
                 Preview offline
               </button>
             )}
-          </div>
-        </footer>
-      </div>
+          </StaggerItem>
+        </StaggerGroup>
+      </PageTransition>
     </div>
   );
 }

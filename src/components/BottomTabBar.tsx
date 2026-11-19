@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import { Bell, Home, Map, User } from 'lucide-react';
+import { TACTILE_TAP, WOVEN_EASE } from '../lib/motion';
 
 interface BottomTabBarProps {
   alertBadgeCount?: number;
@@ -35,21 +37,33 @@ export function BottomTabBar({ alertBadgeCount = 0 }: BottomTabBarProps) {
             <NavLink
               key={tab.to}
               to={tab.to}
-              className={({ isActive }) =>
-                `relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-[26px] px-2 transition-colors ${
-                  isActive
-                    ? 'bg-[var(--ink)] text-[var(--bg)] shadow-sm'
-                    : 'text-[var(--sub)] hover:text-[var(--ink)]'
-                }`
-              }
+              className="relative flex-1"
             >
               {({ isActive }) => (
-                <>
-                  <span className="relative">
+                <motion.div
+                  whileTap={TACTILE_TAP}
+                  className={`relative flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[26px] px-2 transition-colors ${
+                    isActive
+                      ? 'text-[var(--bg)]'
+                      : 'text-[var(--sub)] hover:text-[var(--ink)]'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="agapay-active-tab-pill"
+                      transition={{ duration: 0.3, ease: WOVEN_EASE }}
+                      className="absolute inset-0 rounded-[26px] bg-[var(--ink)] shadow-sm"
+                    />
+                  )}
+                  <span className="relative z-10">
                     <Icon
                       size={21}
                       strokeWidth={isActive ? 2.4 : 2}
-                      className={isActive ? 'text-[var(--accent-bright)] dark:text-[var(--accent-deep)]' : ''}
+                      className={
+                        isActive
+                          ? 'text-[var(--accent-bright)] dark:text-[var(--accent-deep)]'
+                          : ''
+                      }
                     />
                     {tab.badgeCount > 0 ? (
                       <span
@@ -60,8 +74,10 @@ export function BottomTabBar({ alertBadgeCount = 0 }: BottomTabBarProps) {
                       </span>
                     ) : null}
                   </span>
-                  <span className="text-[11px] font-semibold tracking-tight">{tab.label}</span>
-                </>
+                  <span className="relative z-10 text-[11px] font-semibold tracking-tight">
+                    {tab.label}
+                  </span>
+                </motion.div>
               )}
             </NavLink>
           );

@@ -19,6 +19,7 @@ export default defineConfig({
         manualChunks: {
           maplibre: ['maplibre-gl'],
           supabase: ['@supabase/supabase-js'],
+          motion: ['framer-motion'],
         },
       },
     },

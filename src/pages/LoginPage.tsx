@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ArrowLeft, Loader2, LogIn } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { AlertTriangle, ArrowLeft, LogIn } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { AgapayLogo } from '../components/AgapayLogo';
+import { WovenThreadLoader } from '../components/WovenThreadLoader';
+import { TACTILE_TAP } from '../lib/motion';
 import { useAppState } from '../context/AppStateContext';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -114,14 +117,15 @@ export function LoginPage() {
           </div>
         )}
 
-        <button
+        <motion.button
           type="submit"
+          whileTap={TACTILE_TAP}
           disabled={loading || !email || password.length < 6}
           className="flex min-h-[54px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-base font-bold text-[var(--on-accent)] shadow-sm transition disabled:opacity-50"
         >
-          {loading ? <Loader2 size={19} className="animate-spin" /> : <LogIn size={19} />}
+          {loading ? <WovenThreadLoader size="sm" /> : <LogIn size={19} />}
           <span>{loading ? t('auth.signingIn') : t('auth.signIn')}</span>
-        </button>
+        </motion.button>
       </form>
 
       <p className="mt-5 text-center text-sm text-[var(--sub)]">
