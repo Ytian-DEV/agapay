@@ -16,7 +16,7 @@ export function MobileShell({ children, showTabs = true, className = '' }: Mobil
     <div className="min-h-[100dvh] w-full bg-[var(--bg)] text-[var(--ink)]">
       <main
         className={`mx-auto min-h-[100dvh] w-full max-w-md px-4 pt-safe ${
-          showTabs ? 'pb-28' : 'pb-safe'
+          showTabs ? 'pb-36' : 'pb-safe'
         } ${className}`}
       >
         {children}

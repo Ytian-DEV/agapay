@@ -289,10 +289,6 @@ export function OnboardingFlowPage() {
               We sent a confirmation link to <strong className="text-[var(--ink)]">{email}</strong>.
               Confirm your email, then sign in to finish setting up your farm.
             </p>
-            <p className="rounded-xl bg-[var(--bg)] p-3 text-xs text-[var(--sub)]">
-              Tip for testing: in Supabase Dashboard → <strong>Authentication → Providers → Email</strong>,
-              you can turn off <em>Confirm email</em> for instant one-step sign-up.
-            </p>
             <button
               type="button"
               onClick={() => navigate('/login')}

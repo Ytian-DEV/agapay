@@ -293,6 +293,28 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       setLastDbError(null);
       const userData = res.data;
 
+      // Auto-create public.profiles row if user confirmed email & signed in without trigger
+      if (!userData.profile && navigator.onLine) {
+        const autoProfile: Profile = {
+          id: user.id,
+          full_name:
+            (user.user_metadata?.full_name as string | undefined) ||
+            user.email?.split('@')[0] ||
+            'Farmer',
+          phone_number: (user.user_metadata?.phone_number as string | undefined) || '',
+          role: 'farmer',
+          preferred_language: 'en',
+          subscription_tier: 'pro',
+          billing_cycle: 'yearly',
+          sms_alerts_enabled: true,
+          barangay_id: '',
+        };
+        const upRes = await upsertUserProfile(autoProfile, null);
+        if (!upRes.ok && upRes.error) {
+          setLastDbError(upRes.error);
+        }
+      }
+
       setState((prev) => {
         const nextProfile: Profile = userData.profile
           ? userData.profile

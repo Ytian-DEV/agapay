@@ -47,8 +47,14 @@ export function LoginPage() {
         </div>
       </header>
 
-      <div className="flex flex-col items-center pb-4 pt-2">
-        <AgapayLogo size="sm" />
+      <div className="flex flex-col items-center pb-5 pt-2 text-center">
+        <AgapayLogo size="auth" />
+        <p className="font-brand mt-2 text-3xl font-semibold tracking-wide text-[var(--accent)]">
+          AGAPAY
+        </p>
+        <p className="mt-0.5 text-xs font-medium text-[var(--earth)]">
+          {t('brand.tagline')}
+        </p>
       </div>
 
       {!isSupabaseConfigured && (

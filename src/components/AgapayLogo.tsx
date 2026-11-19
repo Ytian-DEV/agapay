@@ -1,10 +1,11 @@
 interface AgapayLogoProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'auth' | 'md' | 'lg';
   className?: string;
 }
 
 const SIZE_MAP = {
   sm: { width: 44, height: 39 },
+  auth: { width: 112, height: 98 },
   md: { width: 140, height: 122 },
   lg: { width: 220, height: 192 },
 };
