@@ -105,7 +105,11 @@
     "yieldEstimate": "Pattapatta nga apit",
     "yieldEstimateSub": "Sako tunggal ektaria sakbay agmula",
     "offlineBanner": "Offline mode — ipakitana ti naudi a naidulin a taya.",
-    "pendingSync": "Awtomatiko a maipaw-it dagiti report no agsubli ti signal."
+    "pendingSync": "Awtomatiko a maipaw-it dagiti report no agsubli ti signal.",
+    "waterloggingLow": "Nababa a peggad",
+    "waterloggingHigh": "Nangato a peggad",
+    "waterloggingCheck": "Kitaen ti talon",
+    "soilWet": "Daga {{pct}}% nabasa"
   },
   "map": {
     "layerRain": "Tudo",
@@ -117,7 +121,14 @@
     "openWhy": "Apay a daytoy ti balakad ken nagtaudan",
     "legendGo": "AGTULOY · Nakasagana",
     "legendWait": "AGURAY · Sukimaten",
-    "legendAvoid": "LIKLIKAN · Nabasa"
+    "legendAvoid": "LIKLIKAN · Nabasa",
+    "myField": "Talonko",
+    "rainLegendTitle": "7-day Rain",
+    "soilLegendTitle": "Soil Moisture",
+    "suitabilityLegendTitle": "Planting Status",
+    "summaryGo": "Ipakita ti Sentinel-1 radar nga umiso ti basa ti daga . Mabalinmon ti agmula.",
+    "summaryWait": "Nabasa pay ti rabaw ti daga  kalpasan ti tudo. Dalusan ti kanal sakbay agmula.",
+    "summaryAvoid": "Nabasa unay ti daga . Urnayen a maibus ti danum sakbay agarado."
   },
   "alerts": {
     "title": "Dagiti Ballaag",
@@ -128,7 +139,15 @@
     "noAlerts": "Awan ti aktibo a ballaag iti barangaymo ita.",
     "disputeAdvisory": "Ilinteg wenno i-report daytoy a balakad",
     "disputeSent": "Nailistan tapno sukimaten ti lokal a technician.",
-    "alertDetailTitle": "Detalye ti ballaag"
+    "alertDetailTitle": "Detalye ti ballaag",
+    "catHeavyRainTitle": "Heavy rain expected soon",
+    "catHeavyRainAction": "Aguray iti 2–3 nga aldaw ken kitaen ti kanal",
+    "catWaterloggingTitle": "Waterlogging risk in low plots",
+    "catWaterloggingAction": "Check standing water & raise ridges",
+    "catDrySpellTitle": "Brief dry spell ahead",
+    "catDrySpellAction": "Water young seedlings early morning",
+    "catWindowTitle": "Planting window opening soon",
+    "catWindowAction": "Nasayaat a panawen — nakasagana nga agmula"
   },
   "rain": {
     "title": "Agtudtudo kadi ita?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Kaumiso ti pattapatta",
     "accuracyNote": "Dagiti reportmo iti tudo ken apit ti mangpasayaat iti sumaruno a taya.",
     "guidesTitle": "Giya iti mula ken kanal",
-    "guideDrainageTip": "Tip iti kanal ken panagtutudo"
+    "guideDrainageTip": "Tip iti kanal ken panagtutudo",
+    "plantingMonth": "Bulan ti panagmula",
+    "thisMonth": "Ita a bulan",
+    "catAll": "All crops",
+    "catGrains": "Rice & Corn",
+    "catRoots": "Root crops",
+    "catVegetables": "Vegetables",
+    "catLegumes": "Legumes",
+    "catFruitsFiber": "Fruits & Fiber",
+    "proBanner": "Full AI crowding alerts unlock on Agapay Pro (₱69/mo).",
+    "recommendedForMonth": "Kasayaatan nga imula iti {{month}}",
+    "inSeasonLabel": "in season",
+    "inSeasonBadge": "Umiso a panawen",
+    "noInSeasonCategory": "No crops in this category are in season for {{month}}.",
+    "otherInSeason": "More in-season crops ({{month}})",
+    "outOfSeasonHeading": "Saan a panawen iti {{month}} — aguray",
+    "outOfSeasonBadge": "Saan a panawen",
+    "bestMonthsLabel": "Nasayaat a bulbulan",
+    "crowdingAdvice": "Only in-season crops are ranked above. High crowding in Brgy. {{barangay}} warns of possible oversupply."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Dagup a naimula",
     "activeFarmers": "Agreport a mannalon",
     "barangayBreakdown": "Detalye tunggal barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Sumrek (Sign in)",
+    "signingIn": "Sumsumrek...",
+    "signInExisting": "Sumrek iti account-mo",
+    "createAccount": "Agaramid iti account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Baro ka kadi iti Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Nasayaat a panawen — nakasagana nga agmula",
+    "goDesc": "Ipakita ti Sentinel-1 radar nga umiso ti basa ti daga ({{pct}}%). Mabalinmon ti agmula.",
+    "waitHeadline": "Aguray iti 2–3 nga aldaw ken kitaen ti kanal",
+    "waitDesc": "Nabasa pay ti rabaw ti daga ({{pct}}%) kalpasan ti tudo. Dalusan ti kanal sakbay agmula.",
+    "avoidHeadline": "Saan pay nga agmula — nangato ti layus",
+    "avoidDesc": "Nabasa unay ti daga ({{pct}}%). Urnayen a maibus ti danum sakbay agarado."
+  },
+  "window": {
+    "edgeUncertainty": "Adda ±2 nga aldaw a panagbalbaliw iti petsa",
+    "rainOutlook": "Pattapatta ti tudo (7 nga aldaw)",
+    "soilMoisture": "Basa ti rabaw ti daga",
+    "drainageBaseline": "Kasasaad ti kanal ken daga",
+    "dataType": "Klase ti datos",
+    "whyTitle": "Apay a daytoy ti umiso a panagmula?",
+    "whyRadarTitle": "Radar a lumasat iti ulep (Sentinel-1)",
+    "whyRadarBody": "Rukodenna ti basa ti daga uray no naulep ken agtudtudo.",
+    "whyWeatherTitle": "Lokal a panawen (PAGASA + ERA5)",
+    "whyWeatherBody": "Naibagay iti 30 m a kangato manipud Mt. Pangasugan agingga iti igid ti baybay.",
+    "whyFarmerTitle": "Report dagiti mannalon",
+    "whyFarmerBody": "Ma-adjust tunggal lawas babaen ti report iti tudo ken apit.",
+    "disputeSoilDrier": "Soil is drier here",
+    "disputeSoilWetter": "Field is flooded",
+    "disputeRainMismatch": "Rain did not match",
+    "disputeTiming": "Timing feels off",
+    "disputeNotePlaceholder": "Optional note for Baybay CAO technician..."
   }
 }

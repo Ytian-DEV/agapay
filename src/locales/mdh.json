@@ -105,7 +105,11 @@
     "yieldEstimate": "Tantiya a ani",
     "yieldEstimateSub": "Sako kada ektarya bago mula",
     "offlineBanner": "Offline mode — ipapakita so ulihi a na-save a tantiya.",
-    "pendingSync": "Awtomatiko a mapadala so mga report amayka mbalik so signal."
+    "pendingSync": "Awtomatiko a mapadala so mga report amayka mbalik so signal.",
+    "waterloggingLow": "Mababa a peligro",
+    "waterloggingHigh": "Matas a peligro",
+    "waterloggingCheck": "Ilaya so uma",
+    "soilWet": "Lupa {{pct}}% mabase"
   },
   "map": {
     "layerRain": "Uran",
@@ -117,7 +121,14 @@
     "openWhy": "Enduken ini i panduan endu pinagmulan",
     "legendGo": "PADASUN · Sadiya",
     "legendWait": "TANGGA · Ilaya",
-    "legendAvoid": "PANANGGILA · Mabase"
+    "legendAvoid": "PANANGGILA · Mabase",
+    "myField": "Uma ku",
+    "rainLegendTitle": "7-day Rain",
+    "soilLegendTitle": "Soil Moisture",
+    "suitabilityLegendTitle": "Planting Status",
+    "summaryGo": "Ipapakita nu Sentinel-1 radar a tama so kabase nu lupa . Pakay den mamula.",
+    "summaryWait": "Mabase pan so lupa  napasad so uran. Limpyohi so kanal bago mamula.",
+    "summaryAvoid": "Mabase a benal so lupa . Tangga taman makababa so ig bago mangarado."
   },
   "alerts": {
     "title": "Mga Pahibalo",
@@ -128,7 +139,15 @@
     "noAlerts": "Da aktibo a pahibalo sa barangay nengka saguna.",
     "disputeAdvisory": "Itadong o i-report ini a panduan",
     "disputeSent": "Narekord den para ilayen nu lokal a technician.",
-    "alertDetailTitle": "Detalye nu pahibalo"
+    "alertDetailTitle": "Detalye nu pahibalo",
+    "catHeavyRainTitle": "Heavy rain expected soon",
+    "catHeavyRainAction": "Tangga sa 2–3 gay endu ilaya so kanal",
+    "catWaterloggingTitle": "Waterlogging risk in low plots",
+    "catWaterloggingAction": "Check standing water & raise ridges",
+    "catDrySpellTitle": "Brief dry spell ahead",
+    "catDrySpellAction": "Water young seedlings early morning",
+    "catWindowTitle": "Planting window opening soon",
+    "catWindowAction": "Mapiya a waktu — nakasadiya den mamula"
   },
   "rain": {
     "title": "Pegkuran ba saguna?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Katumpak nu tantiya",
     "accuracyNote": "So mga report nengka sa uran endu ani magpapiya sa sunod a tantiya.",
     "guidesTitle": "Panduan sa pamula endu kanal",
-    "guideDrainageTip": "Tip sa kanal endu ting-uran"
+    "guideDrainageTip": "Tip sa kanal endu ting-uran",
+    "plantingMonth": "Ulan nu kamula",
+    "thisMonth": "Saguna a ulan",
+    "catAll": "All crops",
+    "catGrains": "Rice & Corn",
+    "catRoots": "Root crops",
+    "catVegetables": "Vegetables",
+    "catLegumes": "Legumes",
+    "catFruitsFiber": "Fruits & Fiber",
+    "proBanner": "Full AI crowding alerts unlock on Agapay Pro (₱69/mo).",
+    "recommendedForMonth": "Pinakamapiya imula sa {{month}}",
+    "inSeasonLabel": "in season",
+    "inSeasonBadge": "Mapiya a waktu",
+    "noInSeasonCategory": "No crops in this category are in season for {{month}}.",
+    "otherInSeason": "More in-season crops ({{month}})",
+    "outOfSeasonHeading": "Di waktu sa {{month}} — tangga pan",
+    "outOfSeasonBadge": "Di waktu",
+    "bestMonthsLabel": "Mapiya a mga ulan",
+    "crowdingAdvice": "Only in-season crops are ranked above. High crowding in Brgy. {{barangay}} warns of possible oversupply."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Kabilugan a namula",
     "activeFarmers": "Nagre-report a mangunguma",
     "barangayBreakdown": "Detalye kada barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Suleg (Sign in)",
+    "signingIn": "Pedsuleg...",
+    "signInExisting": "Suleg sa account nengka",
+    "createAccount": "Mbalay sa account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Bago ka pan sa Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Mapiya a waktu — nakasadiya den mamula",
+    "goDesc": "Ipapakita nu Sentinel-1 radar a tama so kabase nu lupa ({{pct}}%). Pakay den mamula.",
+    "waitHeadline": "Tangga sa 2–3 gay endu ilaya so kanal",
+    "waitDesc": "Mabase pan so lupa ({{pct}}%) napasad so uran. Limpyohi so kanal bago mamula.",
+    "avoidHeadline": "Di pan mamula — matas so baha",
+    "avoidDesc": "Mabase a benal so lupa ({{pct}}%). Tangga taman makababa so ig bago mangarado."
+  },
+  "window": {
+    "edgeUncertainty": "Aden ±2 gay a kabag-o sa petsa",
+    "rainOutlook": "Tantiya nu uran (7 gay)",
+    "soilMoisture": "Kabase nu lupa",
+    "drainageBaseline": "Kahimtang nu kanal endu lupa",
+    "dataType": "Klase nu datos",
+    "whyTitle": "Enduken ini i mapiya a waktu nu kamula?",
+    "whyRadarTitle": "Radar a makalapas sa gabun (Sentinel-1)",
+    "whyRadarBody": "Pagsukat sa kabase nu lupa apiya mauran endu malibog.",
+    "whyWeatherTitle": "Lokal a panahon (PAGASA + ERA5)",
+    "whyWeatherBody": "Pinatama sa 30 m a kapuro manlapud Mt. Pangasugan taman sa ragat.",
+    "whyFarmerTitle": "Mga report nu mangunguma",
+    "whyFarmerBody": "Pinapiya kada semana gamit so report sa uran endu ani.",
+    "disputeSoilDrier": "Soil is drier here",
+    "disputeSoilWetter": "Field is flooded",
+    "disputeRainMismatch": "Rain did not match",
+    "disputeTiming": "Timing feels off",
+    "disputeNotePlaceholder": "Optional note for Baybay CAO technician..."
   }
 }

@@ -105,7 +105,11 @@
     "yieldEstimate": "Banabana sa ani",
     "yieldEstimateSub": "Sako matag ektarya sa dili pa motanom",
     "offlineBanner": "Offline mode — gipakita ang katapusang na-save nga taya.",
-    "pendingSync": "Mo-upload ra dayon ang imong mga taho kon mobalik ang signal."
+    "pendingSync": "Mo-upload ra dayon ang imong mga taho kon mobalik ang signal.",
+    "waterloggingLow": "Ubos ang risgo",
+    "waterloggingHigh": "Taas ang risgo",
+    "waterloggingCheck": "Susiha ang uma",
+    "soilWet": "Yuta {{pct}}% basa"
   },
   "map": {
     "layerRain": "Ulan",
@@ -117,7 +121,14 @@
     "openWhy": "Nganong kini ang tambag ug mga tinubdan",
     "legendGo": "PADAYON · Andam",
     "legendWait": "HULAT · Susiha",
-    "legendAvoid": "LIKAYI · Basa"
+    "legendAvoid": "LIKAYI · Basa",
+    "myField": "Akong uma",
+    "rainLegendTitle": "Ulan (7 ka adlaw)",
+    "soilLegendTitle": "Kaumog sa Yuta",
+    "suitabilityLegendTitle": "Kahimtang sa Tanom",
+    "summaryGo": "Maayo ang agos sa tubig ug sakto ang kaumog. Andam na sa pagtanom.",
+    "summaryWait": "Basa pa ang ibabaw sa yuta. Susiha una ang mga kanal sa dili pa motanom.",
+    "summaryAvoid": "Taas ang risgo sa pagpundo sa tubig. Ilangan og 3–4 ka adlaw ang pagtanom."
   },
   "alerts": {
     "title": "Mga Alerto",
@@ -128,7 +139,15 @@
     "noAlerts": "Walay aktibong pasidaan sa imong barangay karon.",
     "disputeAdvisory": "Itama o i-report kining tambag",
     "disputeSent": "Narekord na aron susihon sa lokal nga technician.",
-    "alertDetailTitle": "Detalye sa alerto"
+    "alertDetailTitle": "Detalye sa alerto",
+    "catHeavyRainTitle": "Gilaumang kusog nga ulan",
+    "catHeavyRainAction": "Ilangan og 2–3 ka adlaw ang pagtanom ug limpyohi ang kanal",
+    "catWaterloggingTitle": "Risgo sa paglunop sa ubos nga uma",
+    "catWaterloggingAction": "Susiha ang nagpundo nga tubig ug ipataas ang tudling",
+    "catDrySpellTitle": "Mubo nga hulaw sa umaabot",
+    "catDrySpellAction": "Bisbisi ang gagmayng tanom sayo sa buntag",
+    "catWindowTitle": "Magbukas na ang saktong tingtanom",
+    "catWindowAction": "Andama ang binhi ug mga tudling"
   },
   "rain": {
     "title": "Nag-ulan ba karon?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Katukma sa banabana",
     "accuracyNote": "Ang imong mga taho sa ulan ug ani makapahusto sa sunod nga taya.",
     "guidesTitle": "Giya sa tanom ug kanal",
-    "guideDrainageTip": "Tip sa kanal ug ting-ulan"
+    "guideDrainageTip": "Tip sa kanal ug ting-ulan",
+    "plantingMonth": "Bulan sa pagtanom",
+    "thisMonth": "Karong bulana",
+    "catAll": "Tanan",
+    "catGrains": "Humay ug Mais",
+    "catRoots": "Mga lagutmon",
+    "catVegetables": "Utanon",
+    "catLegumes": "Munggo / Batong",
+    "catFruitsFiber": "Prutas ug Abaka",
+    "proBanner": "Tibuok AI crowding alerts anaa sa Agapay Pro (₱69/bulan).",
+    "recommendedForMonth": "Pinakamaayong itanom sa {{month}}",
+    "inSeasonLabel": "anaa sa panahon",
+    "inSeasonBadge": "Sakto sa panahon",
+    "noInSeasonCategory": "Walay tanom niining kategoryaha nga sakto sa panahon karong {{month}}.",
+    "otherInSeason": "Ubang tanom nga sakto sa panahon ({{month}})",
+    "outOfSeasonHeading": "Dili panahon karong {{month}} — ayaw usa",
+    "outOfSeasonBadge": "Dili panahon",
+    "bestMonthsLabel": "Maayong mga bulan",
+    "crowdingAdvice": "Mga tanom nga sakto sa panahon ra ang girekomenda. Ang \"Daghan na nagtanom\" sa Brgy. {{barangay}} nagpasabot nga basin mobarato kon magdungan tanan."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Tibuok nga natanom",
     "activeFarmers": "Nag-report nga mag-uuma",
     "barangayBreakdown": "Detalye matag barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Sulod (Sign in)",
+    "signingIn": "Nagsulod...",
+    "signInExisting": "Sulod sa imong account",
+    "createAccount": "Paghimo og account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Bag-o pa sa Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Maayong panahon — andam na sa pagtanom",
+    "goDesc": "Gipakita sa Sentinel-1 radar nga sakto ang kaumog sa yuta ({{pct}}%). Mahimo nang mangandam ug motanom sulod niining mga adlawa.",
+    "waitHeadline": "Hulat og 2–3 ka adlaw ug susiha ang kanal",
+    "waitDesc": "Gipakita sa Sentinel-1 radar nga basa pa ang ibabaw sa yuta ({{pct}}%) human sa ulan. Limpyohi ang kanal ug susiha kon walay nagpundo nga tubig sa dili pa motanom.",
+    "avoidHeadline": "Ayaw usa pagtanom — taas ang risgo sa lunop",
+    "avoidDesc": "Basa kaayo ang yuta ({{pct}}%). Hulata nga mohubas ang tubig sa dili pa magdaro aron dili madunot ang gamot."
+  },
+  "window": {
+    "edgeUncertainty": "Ang sinugdanan ug katapusan adunay ±2 ka adlaw nga kabag-ohan",
+    "rainOutlook": "Banabana sa ulan (7 ka adlaw)",
+    "soilMoisture": "Kaumog sa ibabaw sa yuta",
+    "drainageBaseline": "Kahimtang sa kanal ug yuta",
+    "dataType": "Klase sa datos",
+    "whyTitle": "Nganong kini ang saktong tingtanom?",
+    "whyRadarTitle": "Radar nga molapos sa panganod (Sentinel-1)",
+    "whyRadarBody": "Mosukod sa kabasa sa yuta bisan dag-om ug ting-ulan sa Leyte.",
+    "whyWeatherTitle": "Lokal nga panahon (PAGASA + ERA5)",
+    "whyWeatherBody": "Gipahaom sa 30 m nga bakilid gikan sa Mt. Pangasugan padulong sa baybayon.",
+    "whyFarmerTitle": "Mga taho sa mag-uuma",
+    "whyFarmerBody": "Gina-adjust matag semana gamit ang taho sa ulan ug ani sa Baybay City.",
+    "disputeSoilDrier": "Mas uga ang yuta dinhi",
+    "disputeSoilWetter": "Gibahaan ang uma",
+    "disputeRainMismatch": "Wala motakdo ang ulan",
+    "disputeTiming": "Dili sakto ang petsa",
+    "disputeNotePlaceholder": "Dugang pahibalo para sa Baybay CAO technician..."
   }
 }

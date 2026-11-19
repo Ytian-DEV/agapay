@@ -105,7 +105,11 @@
     "yieldEstimate": "Tantiyang ani",
     "yieldEstimateSub": "Sako bawat ektarya bago magtanim",
     "offlineBanner": "Offline mode — ipinapakita ang huling na-save na taya.",
-    "pendingSync": "Awtomatikong ise-send ang mga ulat kapag bumalik ang signal."
+    "pendingSync": "Awtomatikong ise-send ang mga ulat kapag bumalik ang signal.",
+    "waterloggingLow": "Mababang banta",
+    "waterloggingHigh": "Mataas na banta",
+    "waterloggingCheck": "Suriin ang bukid",
+    "soilWet": "Lupa {{pct}}% basa"
   },
   "map": {
     "layerRain": "Ulan",
@@ -117,7 +121,14 @@
     "openWhy": "Bakit ito ang payo at mga pinagmulan",
     "legendGo": "SIGE · Handa",
     "legendWait": "HINTAY · Suriin",
-    "legendAvoid": "IWASAN · Basa"
+    "legendAvoid": "IWASAN · Basa",
+    "myField": "Aking bukid",
+    "rainLegendTitle": "Ulan (7 araw)",
+    "soilLegendTitle": "Halumigmig ng Lupa",
+    "suitabilityLegendTitle": "Lagay ng Tanim",
+    "summaryGo": "Maayos ang daloy ng tubig at sakto ang basa ng lupa. Handa nang magtanim.",
+    "summaryWait": "Basa pa ang ibabaw ng lupa. Suriin muna ang kanal bago magpunla.",
+    "summaryAvoid": "Mataas ang panganib ng pagbabad ng tubig. Ipagpaliban ng 3–4 araw ang pagtatanim."
   },
   "alerts": {
     "title": "Mga Alerto",
@@ -128,7 +139,15 @@
     "noAlerts": "Walang aktibong babala sa iyong barangay ngayon.",
     "disputeAdvisory": "Itama o i-report ang payong ito",
     "disputeSent": "Naitala na para masuri ng lokal na technician.",
-    "alertDetailTitle": "Detalye ng alerto"
+    "alertDetailTitle": "Detalye ng alerto",
+    "catHeavyRainTitle": "Inaasahang malakas na ulan",
+    "catHeavyRainAction": "Ipagpaliban ng 2–3 araw ang tanim at linisin ang kanal",
+    "catWaterloggingTitle": "Banta ng pagbabad ng tubig",
+    "catWaterloggingAction": "Suriin ang nakatigil na tubig at itaas ang taniman",
+    "catDrySpellTitle": "Maikling tagtuyot sa susunod na linggo",
+    "catDrySpellAction": "Diligan ang bagong punla nang maaga sa umaga",
+    "catWindowTitle": "Malapit nang magbukas ang tamang taniman",
+    "catWindowAction": "Ihanda ang binhi at taniman"
   },
   "rain": {
     "title": "Umuulan ba ngayon?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Katumpakan ng taya",
     "accuracyNote": "Pinapaganda ng iyong ulat sa ulan at ani ang susunod na pagtataya.",
     "guidesTitle": "Gabay sa tanim at paagusan",
-    "guideDrainageTip": "Tip sa paagusan at tag-ulan"
+    "guideDrainageTip": "Tip sa paagusan at tag-ulan",
+    "plantingMonth": "Buwan ng pagtatanim",
+    "thisMonth": "Ngayong buwan",
+    "catAll": "Lahat",
+    "catGrains": "Palay at Mais",
+    "catRoots": "Halamang-ugat",
+    "catVegetables": "Gulay",
+    "catLegumes": "Munggo / Sitaw",
+    "catFruitsFiber": "Prutas at Abaka",
+    "proBanner": "Kumpletong AI crowding alerts sa Agapay Pro (₱69/buwan).",
+    "recommendedForMonth": "Pinakamainam itanim sa {{month}}",
+    "inSeasonLabel": "nasa panahon",
+    "inSeasonBadge": "Nasa panahon",
+    "noInSeasonCategory": "Walang tanim sa kategoryang ito ang nasa panahon sa {{month}}.",
+    "otherInSeason": "Iba pang nasa panahon ({{month}})",
+    "outOfSeasonHeading": "Wala sa panahon sa {{month}} — huwag muna",
+    "outOfSeasonBadge": "Wala sa panahon",
+    "bestMonthsLabel": "Tamang mga buwan",
+    "crowdingAdvice": "Mga tanim na nasa panahon lang ang inirerekomenda. Iwasan ang maraming kaparehong tanim sa Brgy. {{barangay}} upang hindi bumaba ang presyo."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Kabuuang natanim",
     "activeFarmers": "Nag-uulat na magsasaka",
     "barangayBreakdown": "Detalye bawat barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Mag-sign in",
+    "signingIn": "Pumapasok...",
+    "signInExisting": "Mag-sign in sa account",
+    "createAccount": "Gumawa ng account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Bago ka ba sa Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Magandang panahon — handa nang magtanim",
+    "goDesc": "Ipinapakita ng Sentinel-1 radar na sakto ang halumigmig ng lupa ({{pct}}%). Maaari nang maghanda at magtanim.",
+    "waitHeadline": "Maghintay ng 2–3 araw at suriin ang kanal",
+    "waitDesc": "Ipinapakita ng Sentinel-1 radar na basa pa ang lupa ({{pct}}%) matapos ang ulan. Linisin ang paagusan bago magtanim.",
+    "avoidHeadline": "Ipagpaliban muna — mataas ang banta ng baha",
+    "avoidDesc": "Lubog sa halumigmig ang lupa ({{pct}}%). Hintaying humupa ang tubig bago mag-araro upang hindi mabulok ang ugat."
+  },
+  "window": {
+    "edgeUncertainty": "May ±2 araw na pagkakaiba sa simula at dulo ng petsa",
+    "rainOutlook": "Taya ng ulan (7 araw)",
+    "soilMoisture": "Halumigmig ng lupa",
+    "drainageBaseline": "Kalagayan ng lupa at kanal",
+    "dataType": "Uri ng datos",
+    "whyTitle": "Bakit ito ang tamang panahon ng pagtatanim?",
+    "whyRadarTitle": "Radar na tumatagos sa ulap (Sentinel-1)",
+    "whyRadarBody": "Sinusukat ang basa ng lupa kahit maulap at maulan sa Leyte.",
+    "whyWeatherTitle": "Lokal na taya ng panahon (PAGASA + ERA5)",
+    "whyWeatherBody": "Inaayos gamit ang 30 m taas ng lupa mula Mt. Pangasugan hanggang baybayin.",
+    "whyFarmerTitle": "Mga ulat ng magsasaka",
+    "whyFarmerBody": "Pinapahusay linggo-linggo mula sa ulat ng ulan at ani sa Baybay City.",
+    "disputeSoilDrier": "Mas tuyo ang lupa rito",
+    "disputeSoilWetter": "Baha ang bukid",
+    "disputeRainMismatch": "Hindi tumugma ang ulan",
+    "disputeTiming": "Hindi akma ang petsa",
+    "disputeNotePlaceholder": "Opsyonal na mensahe para sa technician ng Baybay CAO..."
   }
 }

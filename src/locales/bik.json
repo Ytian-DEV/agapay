@@ -105,7 +105,11 @@
     "yieldEstimate": "Tantiyang ani",
     "yieldEstimateSub": "Sako kada ektarya bago magtanom",
     "offlineBanner": "Offline mode — ipinapahiling an huring na-save na hula.",
-    "pendingSync": "Awtomatikong ipapadara an mga report kun magbalik an signal."
+    "pendingSync": "Awtomatikong ipapadara an mga report kun magbalik an signal.",
+    "waterloggingLow": "Hababang peligro",
+    "waterloggingHigh": "Halangkaw na peligro",
+    "waterloggingCheck": "Hilingon an oma",
+    "soilWet": "Daga {{pct}}% basa"
   },
   "map": {
     "layerRain": "Uran",
@@ -117,7 +121,14 @@
     "openWhy": "Tano ini an giya asin mga ginikanan",
     "legendGo": "SIGE · Andam",
     "legendWait": "HALAT · Hilingon",
-    "legendAvoid": "LIKAYAN · Basa"
+    "legendAvoid": "LIKAYAN · Basa",
+    "myField": "Sakuyang oma",
+    "rainLegendTitle": "7-day Rain",
+    "soilLegendTitle": "Soil Moisture",
+    "suitabilityLegendTitle": "Planting Status",
+    "summaryGo": "Ipinapahiling kan Sentinel-1 radar na tama an basa kan daga . Pwede na magtanom.",
+    "summaryWait": "Basa pa an ibabaw kan daga  pakatapos kan uran. Linigon an kanal bago magtanom.",
+    "summaryAvoid": "Basaon an daga . Halaton na maghupa an tubig bago mag-arado."
   },
   "alerts": {
     "title": "Mga Alerto",
@@ -128,7 +139,15 @@
     "noAlerts": "Mayong aktibong patanid sa saimong barangay ngunyan.",
     "disputeAdvisory": "Itama o i-report ining giya",
     "disputeSent": "Narekord na tanganing hilingon kan lokal na technician.",
-    "alertDetailTitle": "Detalye kan alerto"
+    "alertDetailTitle": "Detalye kan alerto",
+    "catHeavyRainTitle": "Heavy rain expected soon",
+    "catHeavyRainAction": "Maghalat nin 2–3 aldaw asin hilingon an kanal",
+    "catWaterloggingTitle": "Waterlogging risk in low plots",
+    "catWaterloggingAction": "Check standing water & raise ridges",
+    "catDrySpellTitle": "Brief dry spell ahead",
+    "catDrySpellAction": "Water young seedlings early morning",
+    "catWindowTitle": "Planting window opening soon",
+    "catWindowAction": "Marhay na panahon — andam na magtanom"
   },
   "rain": {
     "title": "Nag-uuran daw ngunyan?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Katumpakan kan hula",
     "accuracyNote": "An mga report mo sa uran asin ani nagpapagayon kan sunod na tantiya.",
     "guidesTitle": "Giya sa tanom asin kanal",
-    "guideDrainageTip": "Tip sa kanal asin tag-uran"
+    "guideDrainageTip": "Tip sa kanal asin tag-uran",
+    "plantingMonth": "Bulan nin pagtanom",
+    "thisMonth": "Ngunyan na bulan",
+    "catAll": "All crops",
+    "catGrains": "Rice & Corn",
+    "catRoots": "Root crops",
+    "catVegetables": "Vegetables",
+    "catLegumes": "Legumes",
+    "catFruitsFiber": "Fruits & Fiber",
+    "proBanner": "Full AI crowding alerts unlock on Agapay Pro (₱69/mo).",
+    "recommendedForMonth": "Pinakamarhay itanom sa {{month}}",
+    "inSeasonLabel": "in season",
+    "inSeasonBadge": "Nasa panahon",
+    "noInSeasonCategory": "No crops in this category are in season for {{month}}.",
+    "otherInSeason": "More in-season crops ({{month}})",
+    "outOfSeasonHeading": "Bako panahon sa {{month}} — halat muna",
+    "outOfSeasonBadge": "Bako panahon",
+    "bestMonthsLabel": "Marhay na mga bulan",
+    "crowdingAdvice": "Only in-season crops are ranked above. High crowding in Brgy. {{barangay}} warns of possible oversupply."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Kabilogan na natanom",
     "activeFarmers": "Nagre-report na paraoma",
     "barangayBreakdown": "Detalye kada barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Maglaog (Sign in)",
+    "signingIn": "Naglalaog...",
+    "signInExisting": "Maglaog sa account mo",
+    "createAccount": "Maggibo nin account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Bago ka pa sa Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Marhay na panahon — andam na magtanom",
+    "goDesc": "Ipinapahiling kan Sentinel-1 radar na tama an basa kan daga ({{pct}}%). Pwede na magtanom.",
+    "waitHeadline": "Maghalat nin 2–3 aldaw asin hilingon an kanal",
+    "waitDesc": "Basa pa an ibabaw kan daga ({{pct}}%) pakatapos kan uran. Linigon an kanal bago magtanom.",
+    "avoidHeadline": "Dai muna magtanom — halangkaw an baha",
+    "avoidDesc": "Basaon an daga ({{pct}}%). Halaton na maghupa an tubig bago mag-arado."
+  },
+  "window": {
+    "edgeUncertainty": "Igwang ±2 aldaw na pagkakaiba sa petsa",
+    "rainOutlook": "Tantiya kan uran (7 aldaw)",
+    "soilMoisture": "Pagkabasa kan daga",
+    "drainageBaseline": "Kamugtakan kan kanal asin daga",
+    "dataType": "Klase kan datos",
+    "whyTitle": "Tano ini an tamang panahon nin pagtanom?",
+    "whyRadarTitle": "Radar na naglalapos sa panganuron (Sentinel-1)",
+    "whyRadarBody": "Sinusukol an basa kan daga maski mauran asin madampog.",
+    "whyWeatherTitle": "Lokal na panahon (PAGASA + ERA5)",
+    "whyWeatherBody": "Pinahaom sa 30 m na langkaw hale sa Mt. Pangasugan sagkod baybayon.",
+    "whyFarmerTitle": "Mga report kan paraoma",
+    "whyFarmerBody": "Pinapagayon kada semana hale sa mga report sa uran asin ani.",
+    "disputeSoilDrier": "Soil is drier here",
+    "disputeSoilWetter": "Field is flooded",
+    "disputeRainMismatch": "Rain did not match",
+    "disputeTiming": "Timing feels off",
+    "disputeNotePlaceholder": "Optional note for Baybay CAO technician..."
   }
 }

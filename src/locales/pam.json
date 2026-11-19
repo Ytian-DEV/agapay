@@ -105,7 +105,11 @@
     "yieldEstimate": "Tantiyang pupul",
     "yieldEstimateSub": "Saku balang ektarya bayu magtanam",
     "offlineBanner": "Offline mode — papakit na ing tauling me-save a tantiya.",
-    "pendingSync": "Kusa lang mipadala ding ulat potang mibalik ing signal."
+    "pendingSync": "Kusa lang mipadala ding ulat potang mibalik ing signal.",
+    "waterloggingLow": "Mababang panganib",
+    "waterloggingHigh": "Matas a panganib",
+    "waterloggingCheck": "Surian ing asikan",
+    "soilWet": "Gabun {{pct}}% mabasa"
   },
   "map": {
     "layerRain": "Uran",
@@ -117,7 +121,14 @@
     "openWhy": "O bakit ini ing payu at penibatan",
     "legendGo": "SIGE · Sadya",
     "legendWait": "MANAYA · Surian",
-    "legendAvoid": "LIWATAN · Mabasa"
+    "legendAvoid": "LIWATAN · Mabasa",
+    "myField": "Ing asikan ku",
+    "rainLegendTitle": "7-day Rain",
+    "soilLegendTitle": "Soil Moisture",
+    "suitabilityLegendTitle": "Planting Status",
+    "summaryGo": "Papakit ning Sentinel-1 radar a ustu ya ing basa ning gabun . Malyari nang magtanam.",
+    "summaryWait": "Mabasa ya pa ing babo ning gabun  kayari ning uran. Linisan ing kanal bayu magtanam.",
+    "summaryAvoid": "Mabasa yang lubus ing gabun . Panayan a mibawas ing danum bayu mag-araru."
   },
   "alerts": {
     "title": "Ding Alerto",
@@ -128,7 +139,15 @@
     "noAlerts": "Alang aktibung babala king kekang barangay ngeni.",
     "disputeAdvisory": "Itulid o i-report ining payu",
     "disputeSent": "Mirekord ne bang surian ning lokal a technician.",
-    "alertDetailTitle": "Detalye ning alerto"
+    "alertDetailTitle": "Detalye ning alerto",
+    "catHeavyRainTitle": "Heavy rain expected soon",
+    "catHeavyRainAction": "Manaya 2–3 aldo at surian ing kanal",
+    "catWaterloggingTitle": "Waterlogging risk in low plots",
+    "catWaterloggingAction": "Check standing water & raise ridges",
+    "catDrySpellTitle": "Brief dry spell ahead",
+    "catDrySpellAction": "Water young seedlings early morning",
+    "catWindowTitle": "Planting window opening soon",
+    "catWindowAction": "Mayap a panaun — makasadya nang magtanam"
   },
   "rain": {
     "title": "Muran ya ngeni?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Kaustuan ning tantiya",
     "accuracyNote": "Ding kekang ulat king uran at pupul papasantingan da ing tutuki a tantiya.",
     "guidesTitle": "Giya king tanam at kanal",
-    "guideDrainageTip": "Tip king kanal at kauran"
+    "guideDrainageTip": "Tip king kanal at kauran",
+    "plantingMonth": "Bulan ning pamanatanam",
+    "thisMonth": "Ngening bulan",
+    "catAll": "All crops",
+    "catGrains": "Rice & Corn",
+    "catRoots": "Root crops",
+    "catVegetables": "Vegetables",
+    "catLegumes": "Legumes",
+    "catFruitsFiber": "Fruits & Fiber",
+    "proBanner": "Full AI crowding alerts unlock on Agapay Pro (₱69/mo).",
+    "recommendedForMonth": "Pekamayap itanam king {{month}}",
+    "inSeasonLabel": "in season",
+    "inSeasonBadge": "Ustu king panaun",
+    "noInSeasonCategory": "No crops in this category are in season for {{month}}.",
+    "otherInSeason": "More in-season crops ({{month}})",
+    "outOfSeasonHeading": "Ali panaun king {{month}} — manaya pa",
+    "outOfSeasonBadge": "Ali panaun",
+    "bestMonthsLabel": "Mayap a bulan",
+    "crowdingAdvice": "Only in-season crops are ranked above. High crowding in Brgy. {{barangay}} warns of possible oversupply."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Kabilugan a mitanam",
     "activeFarmers": "Mag-ulat a ortelano",
     "barangayBreakdown": "Detalye balang barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Lungub (Sign in)",
+    "signingIn": "Lulungub...",
+    "signInExisting": "Lungub king account mu",
+    "createAccount": "Gawa kang account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Bayu ka pa king Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Mayap a panaun — makasadya nang magtanam",
+    "goDesc": "Papakit ning Sentinel-1 radar a ustu ya ing basa ning gabun ({{pct}}%). Malyari nang magtanam.",
+    "waitHeadline": "Manaya 2–3 aldo at surian ing kanal",
+    "waitDesc": "Mabasa ya pa ing babo ning gabun ({{pct}}%) kayari ning uran. Linisan ing kanal bayu magtanam.",
+    "avoidHeadline": "E pa magtanam — matas ing albug",
+    "avoidDesc": "Mabasa yang lubus ing gabun ({{pct}}%). Panayan a mibawas ing danum bayu mag-araru."
+  },
+  "window": {
+    "edgeUncertainty": "Atin ±2 aldo a pamanaliwa king petsa",
+    "rainOutlook": "Tantiya ning uran (7 aldo)",
+    "soilMoisture": "Basa ning gabun",
+    "drainageBaseline": "Kabilian ning kanal at gabun",
+    "dataType": "Klasi ning datos",
+    "whyTitle": "O bakit ini ing ustung panaun ning pamanatanam?",
+    "whyRadarTitle": "Radar a lulub king ulap (Sentinel-1)",
+    "whyRadarBody": "Susukdan na ing basa ning gabun agyang maulap at mauran.",
+    "whyWeatherTitle": "Lokal a panaun (PAGASA + ERA5)",
+    "whyWeatherBody": "Mekibage king 30 m a katas manibat Mt. Pangasugan anggang pampang.",
+    "whyFarmerTitle": "Ding ulat ding ortelano",
+    "whyFarmerBody": "Mapapasanting balang domingu gamit ding ulat king uran at pupul.",
+    "disputeSoilDrier": "Soil is drier here",
+    "disputeSoilWetter": "Field is flooded",
+    "disputeRainMismatch": "Rain did not match",
+    "disputeTiming": "Timing feels off",
+    "disputeNotePlaceholder": "Optional note for Baybay CAO technician..."
   }
 }

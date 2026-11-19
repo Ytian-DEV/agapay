@@ -105,7 +105,11 @@
     "yieldEstimate": "Tantiyan ani",
     "yieldEstimateSub": "Sako kada ektarya sakbay mantanen",
     "offlineBanner": "Offline mode — ipapanengneng so sampot a na-save a tantiya.",
-    "pendingSync": "Awtomatikon nipawit iray report no ompawil so signal."
+    "pendingSync": "Awtomatikon nipawit iray report no ompawil so signal.",
+    "waterloggingLow": "Abeban peligro",
+    "waterloggingHigh": "Atagey a peligro",
+    "waterloggingCheck": "Nengnengen so uma",
+    "soilWet": "Dalin {{pct}}% mabasa"
   },
   "map": {
     "layerRain": "Uran",
@@ -117,7 +121,14 @@
     "openWhy": "Akin et saya so simbawa tan nanlapuan",
     "legendGo": "SIGE · Akaparaan",
     "legendWait": "MANALAGAR · Nengnengen",
-    "legendAvoid": "PALIISAN · Mabasa"
+    "legendAvoid": "PALIISAN · Mabasa",
+    "myField": "Umak",
+    "rainLegendTitle": "7-day Rain",
+    "soilLegendTitle": "Soil Moisture",
+    "suitabilityLegendTitle": "Planting Status",
+    "summaryGo": "Ipapanengneng na Sentinel-1 radar ya duga so basa na dalin . Nayari lan mantanen.",
+    "summaryWait": "Mabasa ni so tapew na dalin  kayari na uran. Linisan so kanal sakbay mantanen.",
+    "summaryAvoid": "Mabasa ya maong so dalin . Alagaren ya onbaba so danum sakbay man-arado."
   },
   "alerts": {
     "title": "Saray Patanir",
@@ -128,7 +139,15 @@
     "noAlerts": "Anggapo so aktibon patanir ed barangay mo natan.",
     "disputeAdvisory": "Ipetek o i-report iyan simbawa",
     "disputeSent": "Nairekord la pian surien na lokal a technician.",
-    "alertDetailTitle": "Detalye na patanir"
+    "alertDetailTitle": "Detalye na patanir",
+    "catHeavyRainTitle": "Heavy rain expected soon",
+    "catHeavyRainAction": "Manalagar na 2–3 agew tan nengnengen so kanal",
+    "catWaterloggingTitle": "Waterlogging risk in low plots",
+    "catWaterloggingAction": "Check standing water & raise ridges",
+    "catDrySpellTitle": "Brief dry spell ahead",
+    "catDrySpellAction": "Water young seedlings early morning",
+    "catWindowTitle": "Planting window opening soon",
+    "catWindowAction": "Maong a panaon — akaparaan la ya mantanen"
   },
   "rain": {
     "title": "Omuuran la natan?",
@@ -159,7 +178,25 @@
     "accuracyTitle": "Kaduga na tantiya",
     "accuracyNote": "Saray report mo ed uran tan ani et mangipapasanto ed ontumbok a tantiya.",
     "guidesTitle": "Giya ed tanem tan kanal",
-    "guideDrainageTip": "Tip ed kanal tan panaon na uran"
+    "guideDrainageTip": "Tip ed kanal tan panaon na uran",
+    "plantingMonth": "Bulan na panagtanem",
+    "thisMonth": "Natan a bulan",
+    "catAll": "All crops",
+    "catGrains": "Rice & Corn",
+    "catRoots": "Root crops",
+    "catVegetables": "Vegetables",
+    "catLegumes": "Legumes",
+    "catFruitsFiber": "Fruits & Fiber",
+    "proBanner": "Full AI crowding alerts unlock on Agapay Pro (₱69/mo).",
+    "recommendedForMonth": "Sankaabigan itanem ed {{month}}",
+    "inSeasonLabel": "in season",
+    "inSeasonBadge": "Duga ed panaon",
+    "noInSeasonCategory": "No crops in this category are in season for {{month}}.",
+    "otherInSeason": "More in-season crops ({{month}})",
+    "outOfSeasonHeading": "Aliwan panaon ed {{month}} — manalagar",
+    "outOfSeasonBadge": "Aliwan panaon",
+    "bestMonthsLabel": "Maong a bulan",
+    "crowdingAdvice": "Only in-season crops are ranked above. High crowding in Brgy. {{barangay}} warns of possible oversupply."
   },
   "profile": {
     "title": "Profile",
@@ -190,5 +227,42 @@
     "totalPlanted": "Kabalgan a nitanem",
     "activeFarmers": "Manre-report a dumaralos",
     "barangayBreakdown": "Detalye kada barangay"
+  },
+  "auth": {
+    "accountSub": "Agapay Account",
+    "signIn": "Onloob (Sign in)",
+    "signingIn": "Onloloob...",
+    "signInExisting": "Onloob ed account mo",
+    "createAccount": "Manggawa na account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newToAgapay": "Balo ka ni ed Agapay?"
+  },
+  "advisory": {
+    "goHeadline": "Maong a panaon — akaparaan la ya mantanen",
+    "goDesc": "Ipapanengneng na Sentinel-1 radar ya duga so basa na dalin ({{pct}}%). Nayari lan mantanen.",
+    "waitHeadline": "Manalagar na 2–3 agew tan nengnengen so kanal",
+    "waitDesc": "Mabasa ni so tapew na dalin ({{pct}}%) kayari na uran. Linisan so kanal sakbay mantanen.",
+    "avoidHeadline": "Ag ni mantanen — atagey so delap",
+    "avoidDesc": "Mabasa ya maong so dalin ({{pct}}%). Alagaren ya onbaba so danum sakbay man-arado."
+  },
+  "window": {
+    "edgeUncertainty": "Walay ±2 agew a pandumaan ed petsa",
+    "rainOutlook": "Tantiya na uran (7 agew)",
+    "soilMoisture": "Basa na dalin",
+    "drainageBaseline": "Kipapasen na kanal tan dalin",
+    "dataType": "Klase na datos",
+    "whyTitle": "Akin et saya so dugan panaon na panagtanem?",
+    "whyRadarTitle": "Radar ya onlabas ed lorem (Sentinel-1)",
+    "whyRadarBody": "Suskaten to so basa na dalin anggan malorem tan mauran.",
+    "whyWeatherTitle": "Lokal a panaon (PAGASA + ERA5)",
+    "whyWeatherBody": "Inyapas ed 30 m ya katagey manlapud Mt. Pangasugan anggad baybay.",
+    "whyFarmerTitle": "Saray report na dumaralos",
+    "whyFarmerBody": "Papaabigen kada simba gamit iray report ed uran tan ani.",
+    "disputeSoilDrier": "Soil is drier here",
+    "disputeSoilWetter": "Field is flooded",
+    "disputeRainMismatch": "Rain did not match",
+    "disputeTiming": "Timing feels off",
+    "disputeNotePlaceholder": "Optional note for Baybay CAO technician..."
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Layers, Radar } from 'lucide-react';
 import type { Barangay, DecisionStatus } from '../types/database';
@@ -264,7 +264,7 @@ export function BaybayForecastMap({
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
-    map.on('click', 'zones-fill', (e) => {
+    map.on('click', 'zones-fill', (e: maplibregl.MapLayerMouseEvent) => {
       const feature = e.features?.[0];
       const brgyId = feature?.properties?.barangayId as string | undefined;
       if (brgyId) {
