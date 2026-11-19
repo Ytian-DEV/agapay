@@ -472,7 +472,7 @@ export function OnboardingFlowPage() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
                   {t('onboarding.cropLabel')}
                 </label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
+                <div className="mt-2 grid max-h-[220px] grid-cols-2 gap-2 overflow-y-auto pr-1">
                   {crops.map((crop) => {
                     const active = crop.slug === cropSlug;
                     return (
