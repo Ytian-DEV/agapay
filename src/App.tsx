@@ -1,15 +1,23 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './context/ThemeContext';
 import { MobileShell } from './components/MobileShell';
 import { AgapayLogo } from './components/AgapayLogo';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 
-function PlaceholderView({ title, subtitle }: { title: string; subtitle: string }) {
+function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
+  const { t } = useTranslation();
   return (
     <MobileShell>
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex justify-end pt-2">
+        <LanguageSwitcher variant="pill" />
+      </div>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
         <AgapayLogo size="md" />
-        <h1 className="font-brand mt-4 text-3xl font-semibold text-[var(--accent)]">{title}</h1>
-        <p className="mt-2 max-w-xs text-sm text-[var(--sub)]">{subtitle}</p>
+        <h1 className="font-brand mt-4 text-3xl font-semibold text-[var(--accent)]">
+          {t(titleKey)}
+        </h1>
+        <p className="mt-2 max-w-xs text-sm text-[var(--sub)]">{t(subtitleKey)}</p>
       </div>
     </MobileShell>
   );
@@ -22,28 +30,23 @@ export default function App() {
         <Routes>
           <Route
             path="/"
-            element={
-              <PlaceholderView
-                title="Agapay"
-                subtitle="Plant at the right time. Mobile-first PWA foundation ready."
-              />
-            }
+            element={<PlaceholderView titleKey="brand.name" subtitleKey="brand.tagline" />}
           />
           <Route
             path="/home"
-            element={<PlaceholderView title="Home" subtitle="Planting window & field overview." />}
+            element={<PlaceholderView titleKey="nav.home" subtitleKey="home.plantingWindow" />}
           />
           <Route
             path="/map"
-            element={<PlaceholderView title="Map" subtitle="Hyper-local Baybay City weather-crop map." />}
+            element={<PlaceholderView titleKey="nav.map" subtitleKey="map.tapCellHint" />}
           />
           <Route
             path="/alerts"
-            element={<PlaceholderView title="Alerts" subtitle="Risk & waterlogging advisories." />}
+            element={<PlaceholderView titleKey="alerts.title" subtitleKey="alerts.smsActiveNote" />}
           />
           <Route
             path="/profile"
-            element={<PlaceholderView title="Profile" subtitle="Farm settings, plans & privacy." />}
+            element={<PlaceholderView titleKey="profile.title" subtitleKey="profile.privacySupport" />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
