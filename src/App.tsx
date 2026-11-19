@@ -11,6 +11,7 @@ import { OnboardingFlowPage } from './pages/OnboardingFlowPage';
 import { HomePage } from './pages/HomePage';
 import { PlantingWindowPage } from './pages/PlantingWindowPage';
 import { RainCheckInPage } from './pages/RainCheckInPage';
+import { MapPage } from './pages/MapPage';
 
 function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
   const { t } = useTranslation();
@@ -42,10 +43,7 @@ export default function App() {
             <Route path="/home" element={<HomePage />} />
             <Route path="/planting-window" element={<PlantingWindowPage />} />
             <Route path="/rain-checkin" element={<RainCheckInPage />} />
-            <Route
-              path="/map"
-              element={<PlaceholderView titleKey="nav.map" subtitleKey="map.tapCellHint" />}
-            />
+            <Route path="/map" element={<MapPage />} />
             <Route
               path="/alerts"
               element={<PlaceholderView titleKey="alerts.title" subtitleKey="alerts.smsActiveNote" />}
