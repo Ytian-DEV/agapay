@@ -24,6 +24,33 @@
       rel="stylesheet"
     />
     <title>Agapay — Plant at the right time</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f6f7f4;
+        color: #111312;
+      }
+      html.dark,
+      html.dark body {
+        background-color: #0d100e;
+        color: #f2f4f0;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem('agapay_theme_mode');
+          var dark =
+            mode === 'dark' ||
+            (mode === 'system' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
