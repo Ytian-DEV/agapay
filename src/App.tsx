@@ -5,6 +5,9 @@ import { AppStateProvider } from './context/AppStateContext';
 import { MobileShell } from './components/MobileShell';
 import { AgapayLogo } from './components/AgapayLogo';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { WelcomePage } from './pages/WelcomePage';
+import { SmsPreviewPage } from './pages/SmsPreviewPage';
+import { OnboardingFlowPage } from './pages/OnboardingFlowPage';
 
 function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
   const { t } = useTranslation();
@@ -30,10 +33,9 @@ export default function App() {
       <AppStateProvider>
         <BrowserRouter>
           <Routes>
-            <Route
-              path="/"
-              element={<PlaceholderView titleKey="brand.name" subtitleKey="brand.tagline" />}
-            />
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/onboarding" element={<OnboardingFlowPage />} />
+            <Route path="/sms-preview" element={<SmsPreviewPage />} />
             <Route
               path="/home"
               element={<PlaceholderView titleKey="nav.home" subtitleKey="home.plantingWindow" />}
@@ -49,6 +51,10 @@ export default function App() {
             <Route
               path="/profile"
               element={<PlaceholderView titleKey="profile.title" subtitleKey="profile.privacySupport" />}
+            />
+            <Route
+              path="/lgu"
+              element={<PlaceholderView titleKey="lgu.title" subtitleKey="lgu.privacyNote" />}
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
