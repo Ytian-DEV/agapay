@@ -10,6 +10,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    exclude: ['maplibre-gl'],
+  },
   build: {
     rollupOptions: {
       output: {

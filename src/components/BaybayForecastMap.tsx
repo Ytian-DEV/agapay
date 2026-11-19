@@ -6,13 +6,18 @@ import {
   GeolocateControl,
   ScaleControl,
   Popup,
+  setWorkerUrl,
   type GeoJSONSource,
   type MapLayerMouseEvent,
   type StyleSpecification,
 } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Layers, Mountain, Radar } from 'lucide-react';
 import type { Barangay, DecisionStatus } from '../types/database';
+
+// Configure MapLibre GL v6 Web Worker URL explicitly so vector tiles & GeoJSON work in both Vite dev & Vercel production
+setWorkerUrl(maplibreWorkerUrl);
 
 export type ForecastLayer = 'rain' | 'soil' | 'flood' | 'suitability';
 
@@ -302,6 +307,7 @@ export function BaybayForecastMap({
           type: 'raster',
           tiles: [radarTileUrl],
           tileSize: 256,
+          maxzoom: 7, // RainViewer free radar tiles cap at z7; MapLibre smoothly overzooms beyond z7
         });
       }
       if (!hasRadarLayer) {
