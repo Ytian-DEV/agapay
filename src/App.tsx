@@ -8,6 +8,9 @@ import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { WelcomePage } from './pages/WelcomePage';
 import { SmsPreviewPage } from './pages/SmsPreviewPage';
 import { OnboardingFlowPage } from './pages/OnboardingFlowPage';
+import { HomePage } from './pages/HomePage';
+import { PlantingWindowPage } from './pages/PlantingWindowPage';
+import { RainCheckInPage } from './pages/RainCheckInPage';
 
 function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
   const { t } = useTranslation();
@@ -36,10 +39,9 @@ export default function App() {
             <Route path="/" element={<WelcomePage />} />
             <Route path="/onboarding" element={<OnboardingFlowPage />} />
             <Route path="/sms-preview" element={<SmsPreviewPage />} />
-            <Route
-              path="/home"
-              element={<PlaceholderView titleKey="nav.home" subtitleKey="home.plantingWindow" />}
-            />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/planting-window" element={<PlantingWindowPage />} />
+            <Route path="/rain-checkin" element={<RainCheckInPage />} />
             <Route
               path="/map"
               element={<PlaceholderView titleKey="nav.map" subtitleKey="map.tapCellHint" />}
@@ -47,6 +49,26 @@ export default function App() {
             <Route
               path="/alerts"
               element={<PlaceholderView titleKey="alerts.title" subtitleKey="alerts.smsActiveNote" />}
+            />
+            <Route
+              path="/sync"
+              element={<PlaceholderView titleKey="profile.syncStatus" subtitleKey="home.pendingSync" />}
+            />
+            <Route
+              path="/crops"
+              element={<PlaceholderView titleKey="crops.title" subtitleKey="crops.topThreeHint" />}
+            />
+            <Route
+              path="/crop-guides"
+              element={<PlaceholderView titleKey="crops.guidesTitle" subtitleKey="home.cropGuidesSub" />}
+            />
+            <Route
+              path="/yield"
+              element={<PlaceholderView titleKey="crops.yieldTitle" subtitleKey="home.yieldEstimateSub" />}
+            />
+            <Route
+              path="/fields"
+              element={<PlaceholderView titleKey="profile.manageFields" subtitleKey="home.selectedField" />}
             />
             <Route
               path="/profile"
