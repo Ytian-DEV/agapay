@@ -1,25 +1,21 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Bell, Home, Map, User } from 'lucide-react';
 
-export interface BottomTabItem {
-  to: string;
-  label: string;
-  icon: typeof Home;
-  badgeCount?: number;
-}
-
 interface BottomTabBarProps {
-  items?: BottomTabItem[];
+  alertBadgeCount?: number;
 }
 
-const DEFAULT_TABS: BottomTabItem[] = [
-  { to: '/home', label: 'Home', icon: Home },
-  { to: '/map', label: 'Map', icon: Map },
-  { to: '/alerts', label: 'Alerts', icon: Bell },
-  { to: '/profile', label: 'Profile', icon: User },
-];
+export function BottomTabBar({ alertBadgeCount = 0 }: BottomTabBarProps) {
+  const { t } = useTranslation();
 
-export function BottomTabBar({ items = DEFAULT_TABS }: BottomTabBarProps) {
+  const items = [
+    { to: '/home', label: t('nav.home'), icon: Home, badgeCount: 0 },
+    { to: '/map', label: t('nav.map'), icon: Map, badgeCount: 0 },
+    { to: '/alerts', label: t('nav.alerts'), icon: Bell, badgeCount: alertBadgeCount },
+    { to: '/profile', label: t('nav.profile'), icon: User, badgeCount: 0 },
+  ];
+
   return (
     <nav
       aria-label="Primary navigation"
@@ -55,7 +51,7 @@ export function BottomTabBar({ items = DEFAULT_TABS }: BottomTabBarProps) {
                       strokeWidth={isActive ? 2.4 : 2}
                       className={isActive ? 'text-[var(--accent-bright)] dark:text-[var(--accent-deep)]' : ''}
                     />
-                    {tab.badgeCount && tab.badgeCount > 0 ? (
+                    {tab.badgeCount > 0 ? (
                       <span
                         className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
                         style={{ backgroundColor: 'var(--avoid-border)' }}
