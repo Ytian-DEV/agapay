@@ -4,19 +4,19 @@ import { useTranslation } from 'react-i18next';
 import { CheckCircle2, CloudOff, Minus, Plus, X } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { useAppState } from '../context/AppStateContext';
-import { CROPS } from '../data/seedData';
 import type { Crop } from '../types/database';
 
 export function HarvestFeedbackPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeParcel, submitHarvestReport, harvestReports, isOnline } = useAppState();
+  const { crops, activeParcel, submitHarvestReport, harvestReports, isOnline } =
+    useAppState();
 
   const [cropSlug, setCropSlug] = useState<Crop['slug']>(activeParcel.crop_slug);
-  const activeCrop = CROPS.find((c) => c.slug === cropSlug) ?? CROPS[2];
+  const activeCrop = crops.find((c) => c.slug === cropSlug) ?? crops[0];
 
   const [sacks, setSacks] = useState<number>(54);
-  const [variety, setVariety] = useState<string>(activeCrop.varieties[0]);
+  const [variety, setVariety] = useState<string>(activeCrop.varieties[0] ?? 'Local certified');
   const [harvestDate, setHarvestDate] = useState<string>(
     new Date().toISOString().slice(0, 10)
   );
@@ -24,9 +24,9 @@ export function HarvestFeedbackPage() {
 
   const handleCropChange = (slug: Crop['slug']) => {
     setCropSlug(slug);
-    const next = CROPS.find((c) => c.slug === slug);
+    const next = crops.find((c) => c.slug === slug);
     if (next) {
-      setVariety(next.varieties[0]);
+      setVariety(next.varieties[0] ?? 'Local certified');
       setSacks(Math.round((next.typical_yield_min_sacks + next.typical_yield_max_sacks) / 2));
     }
   };
@@ -150,7 +150,7 @@ export function HarvestFeedbackPage() {
                 onChange={(e) => handleCropChange(e.target.value as Crop['slug'])}
                 className="min-h-[44px] rounded-xl bg-[var(--bg)] px-3 text-right font-bold text-[var(--ink)] focus:outline-none"
               >
-                {CROPS.map((c) => (
+                {crops.map((c) => (
                   <option key={c.id} value={c.slug}>
                     {c.name}
                   </option>

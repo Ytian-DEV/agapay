@@ -14,29 +14,32 @@ import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
 import { useAppState } from '../context/AppStateContext';
-import { BARANGAYS, CROPS, CROWDING_BY_BARANGAY } from '../data/seedData';
+import { CROWDING_BY_BARANGAY } from '../data/seedData';
 import type { CrowdingLevel } from '../types/database';
 
 export function CropSuggestionsPage() {
   const { t } = useTranslation();
-  const { activeParcel, isOnline, lastSyncedAt, profile } = useAppState();
+  const { barangays, crops, activeParcel, isOnline, lastSyncedAt, profile } = useAppState();
 
   const [selectedBarangayId, setSelectedBarangayId] = useState<string>(
-    activeParcel.barangay_id || 'brgy-gabas'
+    activeParcel.barangay_id || barangays[0]?.id || ''
   );
 
   const barangay =
-    BARANGAYS.find((b) => b.id === selectedBarangayId) ?? BARANGAYS[0];
+    barangays.find((b) => b.id === selectedBarangayId) ?? barangays[0];
   const hasEnoughFarmers = barangay.reporting_farmers >= 5;
 
-  const topThree = CROPS.slice(0, 3); // Sweet Potato, Rice, Corn (anti-herding: always Top 3)
+  const topThree = crops.slice(0, 3); // Sweet Potato, Rice, Corn (anti-herding: always Top 3)
 
   const getCrowdingForCrop = (slug: string): { level: CrowdingLevel; ha: number } => {
     if (!hasEnoughFarmers) {
       return { level: 'insufficient_data', ha: 0 };
     }
     const row = CROWDING_BY_BARANGAY.find(
-      (r) => r.barangay_id === selectedBarangayId && r.crop_slug === slug
+      (r) =>
+        (r.barangay_id === selectedBarangayId ||
+          r.barangay_name.toLowerCase() === barangay.name.toLowerCase()) &&
+        r.crop_slug === slug
     );
     if (row) return { level: row.crowding_level, ha: row.total_hectares };
     if (slug === 'sweet-potato') return { level: 'low', ha: 18.5 };
@@ -85,25 +88,27 @@ export function CropSuggestionsPage() {
 
       {/* Barangay switcher to inspect Gabas vs sparse Guadalupe (<5 farmers cold-start rule) */}
       <div className="mb-3 flex items-center gap-2 overflow-x-auto pb-1">
-        {['brgy-gabas', 'brgy-hilapnitan', 'brgy-pangasugan', 'brgy-guadalupe'].map((id) => {
-          const b = BARANGAYS.find((x) => x.id === id);
-          if (!b) return null;
-          const active = b.id === selectedBarangayId;
-          return (
-            <button
-              key={b.id}
-              type="button"
-              onClick={() => setSelectedBarangayId(b.id)}
-              className={`min-h-[40px] shrink-0 rounded-full border px-3.5 text-xs font-bold transition ${
-                active
-                  ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]'
-                  : 'border-[var(--border)] bg-[var(--surface)] text-[var(--sub)]'
-              }`}
-            >
-              Brgy. {b.name} ({b.reporting_farmers})
-            </button>
-          );
-        })}
+        {barangays
+          .filter((b) =>
+            ['Gabas', 'Hilapnitan', 'Pangasugan', 'Guadalupe'].includes(b.name)
+          )
+          .map((b) => {
+            const active = b.id === barangay.id;
+            return (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => setSelectedBarangayId(b.id)}
+                className={`min-h-[40px] shrink-0 rounded-full border px-3.5 text-xs font-bold transition ${
+                  active
+                    ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]'
+                    : 'border-[var(--border)] bg-[var(--surface)] text-[var(--sub)]'
+                }`}
+              >
+                Brgy. {b.name} ({b.reporting_farmers})
+              </button>
+            );
+          })}
       </div>
 
       {/* Free Plan Upgrade Hint (still allows viewing guides & previewing crowding) */}

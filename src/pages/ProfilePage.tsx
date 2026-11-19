@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import {
   Activity,
   Building2,
+  CheckCircle2,
   ChevronRight,
   ClipboardCheck,
   CloudCog,
+  LogIn,
   LogOut,
   MapPinned,
   Moon,
@@ -17,12 +19,15 @@ import { MobileShell } from '../components/MobileShell';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { useAppState } from '../context/AppStateContext';
 import { useTheme } from '../context/ThemeContext';
-import { BARANGAYS, CROPS } from '../data/seedData';
 
 export function ProfilePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const {
+    authUser,
+    isAuthenticated,
+    barangays,
+    crops,
     profile,
     activeParcel,
     pendingSyncCount,
@@ -33,8 +38,8 @@ export function ProfilePage() {
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
-  const crop = CROPS.find((c) => c.slug === activeParcel.crop_slug) ?? CROPS[2];
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
+  const crop = crops.find((c) => c.slug === activeParcel.crop_slug) ?? crops[0];
   const accuracyPct = Math.min(94, 78 + Math.min(4, Math.max(0, rainCheckins.length - 1)));
 
   const planSubtitle =
@@ -44,8 +49,8 @@ export function ProfilePage() {
       ? 'LGU & Cooperative multi-user suite'
       : 'All crops, parcels, crowding & yield';
 
-  const handleLogout = () => {
-    resetSession();
+  const handleLogout = async () => {
+    await resetSession();
     setConfirmLogout(false);
     navigate('/');
   };
@@ -54,7 +59,7 @@ export function ProfilePage() {
     <MobileShell>
       <header className="pb-3 pt-1">
         <p className="text-xs font-semibold text-[var(--sub)]">
-          {profile.full_name} · Brgy. {barangay.name}
+          {profile.full_name} · Brgy. {barangay?.name ?? 'Gabas'}
         </p>
         <h1 className="mt-0.5 text-[34px] font-bold leading-tight tracking-tight text-[var(--ink)]">
           {t('profile.title')}
@@ -62,6 +67,32 @@ export function ProfilePage() {
       </header>
 
       <div className="space-y-4">
+        {/* Supabase Account Connection Status Banner */}
+        {isAuthenticated && authUser ? (
+          <div className="status-go flex items-center justify-between gap-2 rounded-2xl px-4 py-3 text-xs font-bold">
+            <span className="flex items-center gap-2 truncate">
+              <CheckCircle2 size={16} className="shrink-0" />
+              <span className="truncate">Synced to Supabase · {authUser.email}</span>
+            </span>
+          </div>
+        ) : (
+          <div className="ag-card flex items-center justify-between gap-3 border-[var(--wait-border)] bg-[var(--wait-bg)] p-3.5 text-xs">
+            <div className="text-[var(--wait-text)]">
+              <p className="font-bold">Local preview mode (not signed in)</p>
+              <p className="mt-0.5 opacity-90">
+                Sign in or register so your account &amp; fields save to Supabase.
+              </p>
+            </div>
+            <Link
+              to="/login"
+              className="inline-flex min-h-[40px] shrink-0 items-center gap-1 rounded-full bg-[var(--accent)] px-3.5 text-xs font-bold text-[var(--on-accent)]"
+            >
+              <LogIn size={14} />
+              <span>Sign in</span>
+            </Link>
+          </div>
+        )}
+
         {/* Subscription Plan Card (Figma 17 Profile) */}
         <section className="ag-card flex items-center justify-between gap-3 p-4">
           <div>
@@ -94,7 +125,7 @@ export function ProfilePage() {
             </div>
             <div className="flex items-center gap-1.5 text-sm text-[var(--sub)]">
               <span>
-                {crop.name} · {activeParcel.area_ha} {t('common.hectares')}
+                {crop?.name ?? 'Corn'} · {activeParcel.area_ha} {t('common.hectares')}
               </span>
               <ChevronRight size={17} />
             </div>
@@ -235,7 +266,8 @@ export function ProfilePage() {
           >
             <h2 className="text-xl font-bold text-[var(--ink)]">{t('profile.logoutConfirm')}</h2>
             <p className="mt-1.5 text-sm text-[var(--sub)]">
-              Your local demo settings will reset back to the Welcome screen.
+              You will be signed out of Agapay on this device. Your saved Supabase data remains
+              safe.
             </p>
             <div className="mt-5 flex gap-3">
               <button

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
@@ -7,80 +7,142 @@ import {
   Bell,
   Check,
   CheckCircle2,
+  Loader2,
+  MailCheck,
   MapPin,
   ShieldCheck,
   Sprout,
 } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
-import { BARANGAYS, CROPS, MAP_GRID_CELLS } from '../data/seedData';
+import { MAP_GRID_CELLS } from '../data/seedData';
 import { useAppState } from '../context/AppStateContext';
+import { isSupabaseConfigured } from '../lib/supabase';
 import type { Crop } from '../types/database';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 export function OnboardingFlowPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { profile, consent, updateProfile, updateConsent, completeOnboarding } = useAppState();
+  const {
+    barangays,
+    crops,
+    profile,
+    consent,
+    isAuthenticated,
+    signUp,
+    completeOnboarding,
+  } = useAppState();
 
-  const [step, setStep] = useState(1);
-  const [phone, setPhone] = useState(profile.phone_number || '0917 482 1930');
-  const [otp, setOtp] = useState('482910');
-  const [fullName, setFullName] = useState(profile.full_name || 'Mang Sauro');
-  const [barangayId, setBarangayId] = useState(profile.barangay_id || 'brgy-gabas');
+  const [step, setStep] = useState(isAuthenticated ? 2 : 1);
 
-  // RA 10173 granular consent
+  // Step 1: Real Supabase Account creation
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState(
+    profile.full_name === 'Mang Sauro' ? '' : profile.full_name
+  );
+  const [phone, setPhone] = useState('');
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [awaitingEmailConfirm, setAwaitingEmailConfirm] = useState(false);
+
+  // Step 2: Barangay selection (live Supabase barangays!)
+  const [barangayId, setBarangayId] = useState(
+    barangays.find((b) => b.name === 'Gabas')?.id ?? barangays[0]?.id ?? ''
+  );
+
+  // Step 3: RA 10173 granular consent
   const [locConsent, setLocConsent] = useState(consent.location_consent);
   const [farmConsent, setFarmConsent] = useState(consent.farm_data_consent);
   const [remConsent, setRemConsent] = useState(consent.reminders_consent);
   const [agreed, setAgreed] = useState(true);
 
-  // Field setup
+  // Step 4: Field setup
   const [fieldName, setFieldName] = useState('Northern Field');
   const [cropSlug, setCropSlug] = useState<Crop['slug']>('corn');
   const [areaHa, setAreaHa] = useState('1.5');
   const [gridCell, setGridCell] = useState('B2');
+  const [savingFarm, setSavingFarm] = useState(false);
 
-  const selectedBarangay = BARANGAYS.find((b) => b.id === barangayId) ?? BARANGAYS[0];
-  const selectedCrop = CROPS.find((c) => c.slug === cropSlug) ?? CROPS[2];
+  const selectedBarangay =
+    barangays.find((b) => b.id === barangayId) ?? barangays[0];
+  const selectedCrop = crops.find((c) => c.slug === cropSlug) ?? crops[0];
   const parsedArea = Math.max(0.1, Number.parseFloat(areaHa) || 1.0);
   const isOutlier = parsedArea > 25;
 
   const handleBack = () => {
-    if (step === 1) {
+    if (step === 1 || (step === 2 && isAuthenticated)) {
       navigate('/');
     } else {
       setStep((s) => s - 1);
     }
   };
 
-  const handleFinish = () => {
-    updateProfile({
-      full_name: fullName.trim() || 'Farmer',
-      phone_number: phone.trim(),
-      barangay_id: barangayId,
-      sms_alerts_enabled: remConsent,
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+
+    if (!isSupabaseConfigured) {
+      // Allow local offline flow if Supabase is not configured
+      setStep(2);
+      return;
+    }
+
+    setAuthBusy(true);
+    const res = await signUp({
+      email,
+      password,
+      fullName: fullName.trim() || 'Farmer',
+      phoneNumber: phone.trim() || undefined,
+      preferredLanguage: i18n.language,
     });
-    updateConsent({
-      location_consent: locConsent,
-      farm_data_consent: farmConsent,
-      reminders_consent: remConsent,
-      privacy_policy_accepted: agreed,
-      agreed_at: new Date().toISOString(),
-    });
-    completeOnboarding({
-      field_name: fieldName.trim() || `${selectedBarangay.name} Field`,
-      barangay_id: barangayId,
-      crop_slug: cropSlug,
-      area_ha: parsedArea,
-      is_outlier_flagged: isOutlier,
-      technician_verified: false,
-      grid_cell: gridCell,
-      lat: selectedBarangay.center_lat,
-      lng: selectedBarangay.center_lng,
-      drainage_note: `${selectedBarangay.soil_texture} · ${selectedBarangay.drainage_class.replace('_', ' ')}`,
-    });
+    setAuthBusy(false);
+
+    if (!res.ok) {
+      setAuthError(res.error ?? 'Could not create account.');
+      return;
+    }
+
+    if (res.needsEmailConfirmation) {
+      setAwaitingEmailConfirm(true);
+      return;
+    }
+
+    setStep(2);
+  };
+
+  const handleFinish = async () => {
+    setSavingFarm(true);
+    await completeOnboarding(
+      {
+        field_name: fieldName.trim() || `${selectedBarangay.name} Field`,
+        barangay_id: selectedBarangay.id,
+        crop_slug: cropSlug,
+        area_ha: parsedArea,
+        is_outlier_flagged: isOutlier,
+        technician_verified: false,
+        grid_cell: gridCell,
+        lat: selectedBarangay.center_lat,
+        lng: selectedBarangay.center_lng,
+        drainage_note: `${selectedBarangay.soil_texture} · ${selectedBarangay.drainage_class.replace('_', ' ')}`,
+      },
+      {
+        full_name: fullName.trim() || profile.full_name || 'Farmer',
+        phone_number: phone.trim() || profile.phone_number,
+        barangay_id: selectedBarangay.id,
+        sms_alerts_enabled: remConsent,
+        preferred_language: i18n.language as typeof profile.preferred_language,
+      },
+      {
+        location_consent: locConsent,
+        farm_data_consent: farmConsent,
+        reminders_consent: remConsent,
+        privacy_policy_accepted: agreed,
+      }
+    );
+    setSavingFarm(false);
     navigate('/home');
   };
 
@@ -116,142 +178,169 @@ export function OnboardingFlowPage() {
       </header>
 
       <div className="mt-2 pb-8">
-        {/* STEP 1: Mobile Registration */}
-        {step === 1 && (
-          <section className="space-y-5">
+        {/* STEP 1: Real Supabase Account Sign-Up */}
+        {step === 1 && !awaitingEmailConfirm && (
+          <form onSubmit={handleCreateAccount} className="space-y-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                1 / {TOTAL_STEPS} · SMS & Account
+                1 / {TOTAL_STEPS} · Agapay Account
               </p>
               <h1 className="mt-1 text-3xl font-bold tracking-tight text-[var(--ink)]">
-                {t('onboarding.mobileTitle')}
+                Create your account
               </h1>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--sub)]">
-                {t('onboarding.mobilePrompt')}
+              <p className="mt-1.5 text-sm leading-relaxed text-[var(--sub)]">
+                Saves your fields, planting advisories, and harvest reports securely across devices.
               </p>
             </div>
 
-            <div className="ag-card p-4">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                Philippines (+63)
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder={t('onboarding.phonePlaceholder')}
-                className="mt-2 min-h-[52px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 text-lg font-bold tracking-wide text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
-              />
+            <div className="ag-card space-y-3.5 p-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--sub)]">
+                  {t('onboarding.nameLabel')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="e.g., Juan Dela Cruz"
+                  className="mt-1.5 min-h-[48px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 text-base font-semibold text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--sub)]">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="mt-1.5 min-h-[48px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 text-base font-semibold text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--sub)]">
+                  Password (min 6 characters)
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a password"
+                  className="mt-1.5 min-h-[48px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 text-base font-semibold text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--sub)]">
+                  Mobile number (optional · for SMS alerts)
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={t('onboarding.phonePlaceholder')}
+                  className="mt-1.5 min-h-[48px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 text-base font-semibold text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+                />
+              </div>
             </div>
 
+            {authError && (
+              <div className="status-avoid flex items-start gap-2 rounded-2xl p-3.5 text-xs font-bold">
+                <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+                <span>{authError}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={authBusy || !email || password.length < 6 || !fullName.trim()}
+              className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-sm transition disabled:opacity-50"
+            >
+              {authBusy && <Loader2 size={19} className="animate-spin" />}
+              <span>{authBusy ? 'Creating account...' : t('common.continue')}</span>
+            </button>
+
+            <p className="text-center text-sm text-[var(--sub)]">
+              Already have an account?{' '}
+              <Link to="/login" className="font-bold text-[var(--accent)] underline">
+                Sign in
+              </Link>
+            </p>
+          </form>
+        )}
+
+        {/* Email Confirmation Pending Screen (when Supabase Auth Confirm Email is ON) */}
+        {step === 1 && awaitingEmailConfirm && (
+          <section className="ag-card space-y-4 p-6 text-center">
+            <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--go-bg)] text-[var(--go-text)]">
+              <MailCheck size={34} />
+            </span>
+            <h1 className="text-2xl font-bold text-[var(--ink)]">Account created!</h1>
+            <p className="text-sm leading-relaxed text-[var(--sub)]">
+              We sent a confirmation link to <strong className="text-[var(--ink)]">{email}</strong>.
+              Confirm your email, then sign in to finish setting up your farm.
+            </p>
+            <p className="rounded-xl bg-[var(--bg)] p-3 text-xs text-[var(--sub)]">
+              Tip for testing: in Supabase Dashboard → <strong>Authentication → Providers → Email</strong>,
+              you can turn off <em>Confirm email</em> for instant one-step sign-up.
+            </p>
             <button
               type="button"
-              onClick={() => setStep(2)}
-              disabled={phone.replace(/\D/g, '').length < 10}
-              className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-sm transition disabled:opacity-50"
+              onClick={() => navigate('/login')}
+              className="flex min-h-[52px] w-full items-center justify-center rounded-full bg-[var(--accent)] text-base font-bold text-[var(--on-accent)]"
             >
-              {t('onboarding.sendCode')}
+              Go to Sign in
             </button>
           </section>
         )}
 
-        {/* STEP 2: OTP Verification */}
+        {/* STEP 2: Barangay Selection */}
         {step === 2 && (
           <section className="space-y-5">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                2 / {TOTAL_STEPS} · Verification
+                2 / {TOTAL_STEPS} · Location
               </p>
               <h1 className="mt-1 text-3xl font-bold tracking-tight text-[var(--ink)]">
-                {t('onboarding.otpTitle')}
+                {t('onboarding.barangayLabel')}
               </h1>
-              <p className="mt-2 text-sm text-[var(--sub)]">
-                {t('onboarding.otpPrompt')} <strong className="text-[var(--ink)]">{phone}</strong>
-              </p>
             </div>
 
-            <div className="ag-card p-5">
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                className="min-h-[60px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] text-center font-mono text-3xl font-bold tracking-[0.4em] text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
-              />
-              <p className="mt-2.5 text-center text-xs text-[var(--sub)]">
-                Demo code pre-filled so you can verify right away.
-              </p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {barangays.map((b) => {
+                const active = b.id === barangayId;
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setBarangayId(b.id)}
+                    className={`flex min-h-[60px] flex-col justify-center rounded-2xl border px-3.5 py-2.5 text-left transition ${
+                      active
+                        ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
+                        : 'border-[var(--border)] bg-[var(--surface)]'
+                    }`}
+                  >
+                    <span className="text-sm font-bold text-[var(--ink)]">Brgy. {b.name}</span>
+                    <span className="text-[11px] text-[var(--sub)]">
+                      {b.elevation_m}m · {b.soil_texture}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             <button
               type="button"
               onClick={() => setStep(3)}
-              disabled={otp.length < 6}
-              className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-sm transition disabled:opacity-50"
-            >
-              {t('onboarding.verify')}
-            </button>
-          </section>
-        )}
-
-        {/* STEP 3: Farmer Info */}
-        {step === 3 && (
-          <section className="space-y-5">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                3 / {TOTAL_STEPS} · Profile
-              </p>
-              <h1 className="mt-1 text-3xl font-bold tracking-tight text-[var(--ink)]">
-                {t('onboarding.farmerInfoTitle')}
-              </h1>
-            </div>
-
-            <div className="ag-card space-y-4 p-4">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                  {t('onboarding.nameLabel')}
-                </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1.5 min-h-[50px] w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 text-base font-semibold text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                  {t('onboarding.barangayLabel')}
-                </label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  {BARANGAYS.map((b) => {
-                    const active = b.id === barangayId;
-                    return (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => setBarangayId(b.id)}
-                        className={`flex min-h-[54px] flex-col justify-center rounded-2xl border px-3 py-2 text-left transition ${
-                          active
-                            ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
-                            : 'border-[var(--border)] bg-[var(--bg)]'
-                        }`}
-                      >
-                        <span className="text-sm font-bold text-[var(--ink)]">Brgy. {b.name}</span>
-                        <span className="text-[11px] text-[var(--sub)]">
-                          {b.elevation_m}m · {b.soil_texture}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setStep(4)}
               className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-sm"
             >
               {t('common.continue')}
@@ -259,12 +348,12 @@ export function OnboardingFlowPage() {
           </section>
         )}
 
-        {/* STEP 4: RA 10173 Informed Consent (Figma 11 Consent) */}
-        {step === 4 && (
+        {/* STEP 3: RA 10173 Informed Consent (Figma 11 Consent) */}
+        {step === 3 && (
           <section className="space-y-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                4 / {TOTAL_STEPS} · RA 10173 Privacy
+                3 / {TOTAL_STEPS} · RA 10173 Privacy
               </p>
               <h1 className="mt-1 text-3xl font-bold tracking-tight text-[var(--ink)]">
                 {t('onboarding.consentTitle')}
@@ -350,7 +439,7 @@ export function OnboardingFlowPage() {
             <button
               type="button"
               disabled={!agreed}
-              onClick={() => setStep(5)}
+              onClick={() => setStep(4)}
               className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-sm transition disabled:opacity-50"
             >
               {t('common.continue')}
@@ -358,12 +447,12 @@ export function OnboardingFlowPage() {
           </section>
         )}
 
-        {/* STEP 5: Farm Setup & Manual Map Pin (Figma 12 Farm setup) */}
-        {step === 5 && (
+        {/* STEP 4: Farm Setup & Manual Map Pin */}
+        {step === 4 && (
           <section className="space-y-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
-                5 / {TOTAL_STEPS} · Brgy. {selectedBarangay.name}
+                4 / {TOTAL_STEPS} · Brgy. {selectedBarangay.name}
               </p>
               <h1 className="mt-1 text-3xl font-bold tracking-tight text-[var(--ink)]">
                 {t('onboarding.fieldSetupTitle')}
@@ -388,7 +477,7 @@ export function OnboardingFlowPage() {
                   {t('onboarding.cropLabel')}
                 </label>
                 <div className="mt-2 grid grid-cols-2 gap-2">
-                  {CROPS.map((crop) => {
+                  {crops.map((crop) => {
                     const active = crop.slug === cropSlug;
                     return (
                       <button
@@ -430,7 +519,6 @@ export function OnboardingFlowPage() {
                 )}
               </div>
 
-              {/* Manual Map Pin 3x3 Grid */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--sub)]">
                   {t('onboarding.mapPinTitle')}
@@ -451,7 +539,11 @@ export function OnboardingFlowPage() {
                         }`}
                       >
                         <span>{cell.id}</span>
-                        <span className={`text-[10px] font-normal ${active ? 'opacity-90' : 'text-[var(--sub)]'}`}>
+                        <span
+                          className={`text-[10px] font-normal ${
+                            active ? 'opacity-90' : 'text-[var(--sub)]'
+                          }`}
+                        >
                           {cell.barangay_name.replace('Brgy. ', '').split(' ')[0]}
                         </span>
                       </button>
@@ -463,7 +555,7 @@ export function OnboardingFlowPage() {
 
             <button
               type="button"
-              onClick={() => setStep(6)}
+              onClick={() => setStep(5)}
               className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-sm"
             >
               {t('common.review')}
@@ -471,8 +563,8 @@ export function OnboardingFlowPage() {
           </section>
         )}
 
-        {/* STEP 6: Review & Setup Complete */}
-        {step === 6 && (
+        {/* STEP 5: Review & Save to Supabase */}
+        {step === 5 && (
           <section className="space-y-5">
             <div className="flex flex-col items-center pt-2 text-center">
               <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--go-bg)] text-[var(--go-text)]">
@@ -488,14 +580,13 @@ export function OnboardingFlowPage() {
 
             <div className="ag-card divide-y divide-[var(--border)] text-sm">
               {[
-                { label: 'Farmer', value: fullName },
-                { label: 'Mobile (SMS)', value: `${phone} · ${remConsent ? 'SMS On' : 'SMS Off'}` },
+                { label: 'Farmer', value: fullName || profile.full_name },
                 { label: 'Field', value: `${fieldName} (Zone ${gridCell})` },
                 { label: 'Location', value: `Brgy. ${selectedBarangay.name}, Baybay City` },
                 { label: 'Primary crop', value: `${selectedCrop.name} (${selectedCrop.local_name})` },
                 {
                   label: 'Area',
-                  value: `${parsedArea} ${t('common.hectares')}${isOutlier ? ' · Flagged for check' : ''}`,
+                  value: `${parsedArea} ${t('common.hectares')}${isOutlier ? ' · Flagged' : ''}`,
                 },
               ].map((row) => (
                 <div key={row.label} className="flex items-center justify-between px-4 py-3.5">
@@ -507,11 +598,16 @@ export function OnboardingFlowPage() {
 
             <button
               type="button"
+              disabled={savingFarm}
               onClick={handleFinish}
-              className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-md"
+              className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-[17px] font-semibold text-[var(--on-accent)] shadow-md disabled:opacity-60"
             >
-              <Check size={20} strokeWidth={2.5} />
-              <span>{t('onboarding.goToHome')}</span>
+              {savingFarm ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <Check size={20} strokeWidth={2.5} />
+              )}
+              <span>{savingFarm ? 'Saving to Supabase...' : t('onboarding.goToHome')}</span>
             </button>
           </section>
         )}

@@ -1,10 +1,15 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+  AlertTriangle,
   ArrowLeft,
   CheckCircle2,
   Clock,
   CloudOff,
+  Database,
+  Loader2,
+  LogIn,
   RefreshCw,
   Wifi,
 } from 'lucide-react';
@@ -16,6 +21,10 @@ export function SyncStatusPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const {
+    authUser,
+    isAuthenticated,
+    lastDbError,
+    dbReferenceCounts,
     isOnline,
     isCacheStale,
     lastSyncedAt,
@@ -30,12 +39,20 @@ export function SyncStatusPage() {
     syncPendingNow,
   } = useAppState();
 
+  const [syncing, setSyncing] = useState(false);
+
   const lastSyncFormatted = new Date(lastSyncedAt).toLocaleString([], {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  const handleSync = async () => {
+    setSyncing(true);
+    await syncPendingNow();
+    setSyncing(false);
+  };
 
   return (
     <MobileShell showTabs={false}>
@@ -49,12 +66,81 @@ export function SyncStatusPage() {
           <ArrowLeft size={20} />
         </button>
         <div>
-          <p className="text-xs font-semibold text-[var(--sub)]">PWA Offline Storage</p>
+          <p className="text-xs font-semibold text-[var(--sub)]">Supabase &amp; PWA Storage</p>
           <h1 className="text-2xl font-bold text-[var(--ink)]">{t('profile.syncStatus')}</h1>
         </div>
       </header>
 
       <div className="space-y-4 pb-6">
+        {/* Live Supabase Connection & Auth Diagnostics Card */}
+        <section className="ag-card space-y-3 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span
+                className={`flex h-11 w-11 items-center justify-center rounded-full ${
+                  isSupabaseConfigured && isAuthenticated
+                    ? 'bg-[var(--go-bg)] text-[var(--go-text)]'
+                    : 'bg-[var(--wait-bg)] text-[var(--wait-text)]'
+                }`}
+              >
+                <Database size={20} />
+              </span>
+              <div>
+                <p className="text-sm font-bold text-[var(--ink)]">
+                  {!isSupabaseConfigured
+                    ? 'Supabase Env Not Set'
+                    : isAuthenticated
+                    ? 'Connected & Signed In'
+                    : 'Connected · Guest Preview'}
+                </p>
+                <p className="text-xs text-[var(--sub)]">
+                  {isAuthenticated && authUser
+                    ? `${authUser.email} (${authUser.id.slice(0, 8)}…)`
+                    : 'Sign in to save fields & reports to Supabase'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {dbReferenceCounts && (
+            <div className="grid grid-cols-4 gap-1.5 rounded-xl bg-[var(--bg)] p-2.5 text-center text-[11px]">
+              <div>
+                <p className="font-extrabold text-[var(--ink)]">{dbReferenceCounts.barangays}</p>
+                <p className="text-[var(--sub)]">Barangays</p>
+              </div>
+              <div>
+                <p className="font-extrabold text-[var(--ink)]">{dbReferenceCounts.crops}</p>
+                <p className="text-[var(--sub)]">Crops</p>
+              </div>
+              <div>
+                <p className="font-extrabold text-[var(--ink)]">{dbReferenceCounts.advisories}</p>
+                <p className="text-[var(--sub)]">Advisories</p>
+              </div>
+              <div>
+                <p className="font-extrabold text-[var(--ink)]">{dbReferenceCounts.alerts}</p>
+                <p className="text-[var(--sub)]">Alerts</p>
+              </div>
+            </div>
+          )}
+
+          {lastDbError && (
+            <div className="status-avoid flex items-start gap-2 rounded-xl p-3 text-xs font-semibold">
+              <AlertTriangle size={15} className="mt-0.5 shrink-0" />
+              <span>Supabase error: {lastDbError}</span>
+            </div>
+          )}
+
+          {isSupabaseConfigured && !isAuthenticated && (
+            <Link
+              to="/login"
+              className="flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-sm font-bold text-[var(--on-accent)]"
+            >
+              <LogIn size={16} />
+              <span>Sign in or create Supabase account</span>
+            </Link>
+          )}
+        </section>
+
         {/* Connection & Cache Status Card */}
         <section className="ag-card p-4">
           <div className="flex items-center justify-between gap-3">
@@ -85,36 +171,44 @@ export function SyncStatusPage() {
 
           {isCacheStale && (
             <div className="status-avoid mt-3 rounded-xl px-3.5 py-2.5 text-xs font-bold">
-              {t('common.staleWarning')} — reconnect to download fresh satellite & weather data.
+              {t('common.staleWarning')} — reconnect to download fresh satellite &amp; weather data.
             </div>
           )}
 
           <button
             type="button"
-            disabled={!isOnline}
-            onClick={syncPendingNow}
+            disabled={!isOnline || syncing}
+            onClick={handleSync}
             className="mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-sm font-bold text-[var(--on-accent)] transition disabled:opacity-45"
           >
-            <RefreshCw size={16} />
+            {syncing ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <RefreshCw size={16} />
+            )}
             <span>
-              {pendingSyncCount > 0
+              {syncing
+                ? 'Syncing with Supabase...'
+                : pendingSyncCount > 0
                 ? `Sync ${pendingSyncCount} queued report(s) now`
-                : 'Refresh satellite & forecast cache'}
+                : 'Refresh from Supabase now'}
             </span>
           </button>
-
-          <p className="mt-2.5 text-center text-[11px] text-[var(--muted)]">
-            Backend: {isSupabaseConfigured ? 'Connected to Supabase' : 'Offline-first local mode (Supabase ready)'}
-          </p>
         </section>
 
         {/* Queued & Recent Farmer Reports */}
         <section className="ag-card p-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--sub)]">
-            Local Field Reports Queue
+            Field Reports Queue
           </h2>
           <div className="mt-3 space-y-2.5 text-sm">
-            {rainCheckins.slice(0, 4).map((r) => (
+            {rainCheckins.length === 0 &&
+              harvestReports.length === 0 &&
+              disputes.length === 0 && (
+                <p className="text-xs text-[var(--sub)]">No reports logged yet.</p>
+              )}
+
+            {rainCheckins.slice(0, 5).map((r) => (
               <div
                 key={r.id}
                 className="flex items-center justify-between rounded-xl bg-[var(--bg)] px-3.5 py-2.5"

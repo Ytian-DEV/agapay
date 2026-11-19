@@ -14,21 +14,21 @@ import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
 import { useAppState } from '../context/AppStateContext';
-import { BARANGAYS, INITIAL_ALERTS } from '../data/seedData';
 import type { RiskAlert } from '../types/database';
 
 export function AlertsPage() {
   const { t } = useTranslation();
-  const { activeParcel, profile, updateProfile, submitDispute } = useAppState();
+  const { barangays, alerts, activeParcel, profile, updateProfile, submitDispute } =
+    useAppState();
 
   const [tab, setTab] = useState<'current' | 'history'>('current');
   const [selectedAlert, setSelectedAlert] = useState<RiskAlert | null>(null);
   const [disputedIds, setDisputedIds] = useState<string[]>([]);
 
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
 
-  const list = INITIAL_ALERTS.filter((a) =>
+  const list = alerts.filter((a) =>
     tab === 'current' ? a.is_active : !a.is_active
   );
 

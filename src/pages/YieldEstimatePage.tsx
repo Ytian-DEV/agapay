@@ -5,21 +5,20 @@ import { ArrowLeft, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { StatusPill } from '../components/StatusPill';
 import { useAppState } from '../context/AppStateContext';
-import { BARANGAYS, CROPS } from '../data/seedData';
 import type { Crop } from '../types/database';
 
 export function YieldEstimatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeParcel, lastSyncedAt } = useAppState();
+  const { barangays, crops, activeParcel, lastSyncedAt } = useAppState();
 
   const [selectedSlug, setSelectedSlug] = useState<Crop['slug']>(
     activeParcel.crop_slug === 'cassava' ? 'sweet-potato' : activeParcel.crop_slug
   );
 
-  const crop = CROPS.find((c) => c.slug === selectedSlug) ?? CROPS[2];
+  const crop = crops.find((c) => c.slug === selectedSlug) ?? crops[0];
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
 
   const scaleMin = crop.slug === 'corn' ? 30 : crop.slug === 'rice' ? 50 : 80;
   const scaleMax = crop.slug === 'corn' ? 80 : crop.slug === 'rice' ? 115 : 175;

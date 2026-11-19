@@ -7,6 +7,7 @@ import {
   PHILIPPINE_LANGUAGES,
   type SupportedLanguageCode,
 } from '../i18n';
+import { useAppState } from '../context/AppStateContext';
 
 interface LanguageSwitcherProps {
   variant?: 'pill' | 'row';
@@ -15,6 +16,7 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ variant = 'pill', className = '' }: LanguageSwitcherProps) {
   const { t, i18n } = useTranslation();
+  const { updateProfile } = useAppState();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -32,6 +34,7 @@ export function LanguageSwitcher({ variant = 'pill', className = '' }: LanguageS
 
   const handleSelect = (code: SupportedLanguageCode) => {
     changeAppLanguage(code);
+    void updateProfile({ preferred_language: code });
     setOpen(false);
     setQuery('');
   };
