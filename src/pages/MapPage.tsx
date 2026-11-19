@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,76 +7,71 @@ import {
   Compass,
   Droplets,
   Layers,
-  MapPin,
   Waves,
 } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
+import {
+  BaybayForecastMap,
+  buildBarangayZones,
+  type ForecastLayer,
+} from '../components/BaybayForecastMap';
 import { useAppState } from '../context/AppStateContext';
-import { MAP_GRID_CELLS } from '../data/seedData';
-import type { MapGridCell } from '../types/database';
-
-type MapLayer = 'suitability' | 'rain' | 'soil' | 'flood';
+import { useTheme } from '../context/ThemeContext';
 
 export function MapPage() {
   const { t } = useTranslation();
-  const { crops, activeParcel, lastSyncedAt } = useAppState();
+  const { resolved } = useTheme();
+  const { barangays, crops, activeParcel, lastSyncedAt, isOnline } = useAppState();
 
-  const [layer, setLayer] = useState<MapLayer>('suitability');
-  const [selectedId, setSelectedId] = useState<string>(activeParcel.grid_cell || 'B2');
+  const [layer, setLayer] = useState<ForecastLayer>('suitability');
+  const [flyTrigger, setFlyTrigger] = useState(0);
 
+  const zones = useMemo(() => buildBarangayZones(barangays), [barangays]);
+  const [selectedBarangayId, setSelectedBarangayId] = useState<string>(
+    activeParcel.barangay_id || zones[0]?.barangayId || ''
+  );
+
+  const selectedZone =
+    zones.find((z) => z.barangayId === selectedBarangayId) ?? zones[0];
   const crop = crops.find((c) => c.slug === activeParcel.crop_slug) ?? crops[0];
-  const selectedCell: MapGridCell =
-    MAP_GRID_CELLS.find((c) => c.id === selectedId) ?? MAP_GRID_CELLS[4];
 
-  const layers: { id: MapLayer; label: string; icon: typeof Layers }[] = [
+  const layers: { id: ForecastLayer; label: string; icon: typeof Layers }[] = [
     { id: 'rain', label: t('map.layerRain'), icon: CloudRain },
     { id: 'soil', label: t('map.layerSoil'), icon: Droplets },
     { id: 'flood', label: t('map.layerFlood'), icon: Waves },
     { id: 'suitability', label: t('map.layerSuitability'), icon: Layers },
   ];
 
-  const getCellStyle = (cell: MapGridCell) => {
-    if (layer === 'rain') {
-      if (cell.rain_mm >= 50) return 'status-avoid';
-      if (cell.rain_mm >= 35) return 'status-wait';
-      return 'status-go';
-    }
-    if (layer === 'soil') {
-      if (cell.soil_moisture_pct >= 55) return 'status-avoid';
-      if (cell.soil_moisture_pct >= 38) return 'status-wait';
-      return 'status-go';
-    }
-    if (layer === 'flood') {
-      if (cell.flood_risk === 'high') return 'status-avoid';
-      if (cell.flood_risk === 'medium') return 'status-wait';
-      return 'status-go';
-    }
-    if (cell.decision === 'avoid') return 'status-avoid';
-    if (cell.decision === 'wait') return 'status-wait';
-    return 'status-go';
-  };
-
-  const getCellReading = (cell: MapGridCell) => {
-    if (layer === 'rain') return `${cell.rain_mm} mm`;
-    if (layer === 'soil') return `${cell.soil_moisture_pct}% wet`;
-    if (layer === 'flood') return cell.flood_risk.toUpperCase();
-    return cell.decision.toUpperCase();
-  };
-
   const updatedLabel = new Date(lastSyncedAt).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
   });
 
+  const handleCenterOnField = () => {
+    const match =
+      zones.find((z) => z.barangayId === activeParcel.barangay_id) ?? zones[0];
+    if (match) {
+      setSelectedBarangayId(match.barangayId);
+      setFlyTrigger((n) => n + 1);
+    }
+  };
+
+  const zoneSummary =
+    selectedZone.decision === 'go'
+      ? t('map.summaryGo')
+      : selectedZone.decision === 'avoid'
+      ? t('map.summaryAvoid')
+      : t('map.summaryWait');
+
   return (
     <MobileShell>
-      {/* Layer Switcher Pill Bar (Figma 03 Map top bar) */}
+      {/* Synced 4-Layer Forecast Selector */}
       <header className="pb-3 pt-1">
         <div
           role="tablist"
-          aria-label="Map data layers"
+          aria-label="Map forecast layers"
           className="grid grid-cols-4 gap-1 rounded-full border border-[var(--border)] bg-[var(--surface)] p-1 shadow-xs"
         >
           {layers.map((item) => {
@@ -108,127 +103,119 @@ export function MapPage() {
       {/* Map Header Bar */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-lg font-bold text-[var(--ink)]">Baybay City · {crop.name}</h1>
+          <h1 className="text-lg font-bold text-[var(--ink)]">
+            Baybay City · {crop?.name ?? 'Corn'}
+          </h1>
           <p className="text-xs text-[var(--sub)]">{t('map.tapCellHint')}</p>
         </div>
         <button
           type="button"
-          onClick={() => setSelectedId(activeParcel.grid_cell || 'B2')}
-          aria-label="Center on my field"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-bold text-[var(--accent)] shadow-xs"
+          onClick={handleCenterOnField}
+          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-bold text-[var(--accent)] shadow-xs"
         >
           <Compass size={15} />
-          <span>My field</span>
+          <span>{t('map.myField')}</span>
         </button>
       </div>
 
-      {/* Stylized Baybay City Grid Map Canvas (Non-overlapping, high-contrast) */}
-      <section className="ag-card relative overflow-hidden p-3.5">
-        {/* Subtle coastal & elevation geography hints */}
-        <div className="mb-2.5 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[var(--sub)]">
-          <span>← Camotes Sea (West)</span>
-          <span>Mt. Pangasugan (East) →</span>
-        </div>
+      {/* Real Interactive MapLibre GL Map synced to Rain / Soil / Flood / Suitability */}
+      <BaybayForecastMap
+        zones={zones}
+        selectedBarangayId={selectedZone.barangayId}
+        onSelectZone={setSelectedBarangayId}
+        layer={layer}
+        fieldLng={activeParcel.lng || 124.7962}
+        fieldLat={activeParcel.lat || 10.7285}
+        fieldName={activeParcel.field_name}
+        isDark={resolved === 'dark'}
+        isOnline={isOnline}
+        flyToTrigger={flyTrigger}
+      />
 
-        <div className="grid grid-cols-3 gap-2.5">
-          {MAP_GRID_CELLS.map((cell) => {
-            const isSelected = cell.id === selectedCell.id;
-            const isMyField = cell.id === activeParcel.grid_cell;
+      {/* Dynamic Legend for Active Forecast Layer */}
+      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] font-bold">
+        {layer === 'rain' && (
+          <>
+            <span className="text-[var(--sub)]">{t('map.rainLegendTitle')}:</span>
+            <div className="flex items-center gap-1.5">
+              <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-sky-700 dark:text-sky-300">
+                &lt;30 mm
+              </span>
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-700 dark:text-amber-300">
+                40+ mm
+              </span>
+              <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-red-700 dark:text-red-300">
+                55+ mm
+              </span>
+            </div>
+          </>
+        )}
+        {layer === 'soil' && (
+          <>
+            <span className="text-[var(--sub)]">{t('map.soilLegendTitle')}:</span>
+            <div className="flex items-center gap-1.5">
+              <span className="status-go rounded-full px-2 py-0.5">Optimal &lt;40%</span>
+              <span className="status-info rounded-full px-2 py-0.5">Moist 40–54%</span>
+              <span className="status-avoid rounded-full px-2 py-0.5">Wet 55%+</span>
+            </div>
+          </>
+        )}
+        {(layer === 'flood' || layer === 'suitability') && (
+          <>
+            <span className="text-[var(--sub)]">{t('map.suitabilityLegendTitle')}:</span>
+            <div className="flex items-center gap-1.5">
+              <span className="status-go rounded-full px-2 py-0.5">{t('status.go')}</span>
+              <span className="status-wait rounded-full px-2 py-0.5">{t('status.wait')}</span>
+              <span className="status-avoid rounded-full px-2 py-0.5">{t('status.avoid')}</span>
+            </div>
+          </>
+        )}
+      </div>
 
-            return (
-              <button
-                key={cell.id}
-                type="button"
-                onClick={() => setSelectedId(cell.id)}
-                className={`relative flex min-h-[78px] flex-col items-start justify-between rounded-2xl p-2.5 text-left transition ${getCellStyle(
-                  cell
-                )} ${
-                  isSelected
-                    ? 'scale-[1.02] ring-2 ring-[var(--ink)] ring-offset-2 ring-offset-[var(--surface)]'
-                    : 'opacity-92 hover:opacity-100'
-                }`}
-              >
-                <div className="flex w-full items-center justify-between gap-1">
-                  <span className="text-xs font-extrabold">{cell.id}</span>
-                  {isMyField && (
-                    <span
-                      title={activeParcel.field_name}
-                      className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--ink)] text-[var(--bg)]"
-                    >
-                      <MapPin size={11} />
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-1">
-                  <div className="text-[13px] font-extrabold leading-tight">
-                    {getCellReading(cell)}
-                  </div>
-                  <div className="mt-0.5 truncate text-[10px] font-semibold opacity-85">
-                    {cell.barangay_name.replace('Brgy. ', '')}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Active Field Indicator + Clean Legend */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3 text-[11px]">
-          <span className="inline-flex items-center gap-1.5 font-bold text-[var(--ink)]">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--ink)] text-[var(--bg)]">
-              <MapPin size={11} />
-            </span>
-            {activeParcel.field_name} (Zone {activeParcel.grid_cell})
-          </span>
-          <div className="flex items-center gap-1.5">
-            <span className="status-go rounded-full px-2 py-0.5 font-bold">GO</span>
-            <span className="status-wait rounded-full px-2 py-0.5 font-bold">WAIT</span>
-            <span className="status-avoid rounded-full px-2 py-0.5 font-bold">AVOID</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Selected Zone Detail Sheet Card */}
-      <section className="ag-card mt-3.5 p-4">
+      {/* Selected Zone Detail Card */}
+      <section className="ag-card mt-3 p-4">
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--sub)]">
-              {t('map.selectedZone')} · {selectedCell.id}
+              {t('map.selectedZone')} · {selectedZone.elevationM} m · {selectedZone.soilTexture}
             </p>
             <h2 className="mt-0.5 text-xl font-bold text-[var(--ink)]">
-              {selectedCell.barangay_name}
+              Brgy. {selectedZone.name}
             </h2>
           </div>
-          <StatusPill variant={selectedCell.decision} size="md" />
+          <StatusPill variant={selectedZone.decision} size="md" />
         </div>
 
-        <p className="mt-2 text-sm leading-relaxed text-[var(--sub)]">{selectedCell.summary}</p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--sub)]">{zoneSummary}</p>
 
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-xl bg-[var(--bg)] px-2 py-2">
             <p className="text-[11px] font-semibold text-[var(--sub)]">{t('map.layerRain')}</p>
-            <p className="text-sm font-bold text-[var(--ink)]">{selectedCell.rain_mm} mm</p>
+            <p className="text-sm font-bold text-[var(--ink)]">{selectedZone.rainMm} mm</p>
           </div>
           <div className="rounded-xl bg-[var(--bg)] px-2 py-2">
             <p className="text-[11px] font-semibold text-[var(--sub)]">{t('map.layerSoil')}</p>
             <p className="text-sm font-bold text-[var(--ink)]">
-              {selectedCell.soil_moisture_pct}%
+              {selectedZone.soilMoisturePct}%
             </p>
           </div>
           <div className="rounded-xl bg-[var(--bg)] px-2 py-2">
             <p className="text-[11px] font-semibold text-[var(--sub)]">{t('map.layerFlood')}</p>
-            <p className="text-sm font-bold capitalize text-[var(--ink)]">
-              {selectedCell.flood_risk}
+            <p className="text-sm font-bold text-[var(--ink)]">
+              {selectedZone.floodRisk === 'high'
+                ? t('status.high')
+                : selectedZone.floodRisk === 'medium'
+                ? t('status.medium')
+                : t('status.low')}
             </p>
           </div>
         </div>
 
         <p className="mt-3 text-xs text-[var(--muted)]">
-          {crop.name} ·{' '}
-          {selectedCell.confidence === 'high'
+          {crop?.name} ·{' '}
+          {selectedZone.confidence === 'high'
             ? t('common.confidenceHigh')
-            : selectedCell.confidence === 'low'
+            : selectedZone.confidence === 'low'
             ? t('common.confidenceLow')
             : t('common.confidenceMedium')}{' '}
           · {t('common.updated')} {updatedLabel}
