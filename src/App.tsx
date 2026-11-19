@@ -12,6 +12,8 @@ import { HomePage } from './pages/HomePage';
 import { PlantingWindowPage } from './pages/PlantingWindowPage';
 import { RainCheckInPage } from './pages/RainCheckInPage';
 import { MapPage } from './pages/MapPage';
+import { AlertsPage } from './pages/AlertsPage';
+import { SyncStatusPage } from './pages/SyncStatusPage';
 
 function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
   const { t } = useTranslation();
@@ -44,14 +46,8 @@ export default function App() {
             <Route path="/planting-window" element={<PlantingWindowPage />} />
             <Route path="/rain-checkin" element={<RainCheckInPage />} />
             <Route path="/map" element={<MapPage />} />
-            <Route
-              path="/alerts"
-              element={<PlaceholderView titleKey="alerts.title" subtitleKey="alerts.smsActiveNote" />}
-            />
-            <Route
-              path="/sync"
-              element={<PlaceholderView titleKey="profile.syncStatus" subtitleKey="home.pendingSync" />}
-            />
+            <Route path="/alerts" element={<AlertsPage />} />
+            <Route path="/sync" element={<SyncStatusPage />} />
             <Route
               path="/crops"
               element={<PlaceholderView titleKey="crops.title" subtitleKey="crops.topThreeHint" />}
