@@ -1,5 +1,6 @@
 import React from 'react';
 import { BottomTabBar } from './BottomTabBar';
+import { PageTransition } from './MotionPrimitives';
 
 interface MobileShellProps {
   children: React.ReactNode;
@@ -8,8 +9,8 @@ interface MobileShellProps {
 }
 
 /**
- * Responsive mobile-first container with Capacitor-safe viewport padding.
- * Expands gracefully on larger screens while preserving Agapay's clean phone proportions.
+ * Responsive mobile-first container with Capacitor-safe viewport padding
+ * and unified woven horizontal page transitions.
  */
 export function MobileShell({ children, showTabs = true, className = '' }: MobileShellProps) {
   return (
@@ -19,7 +20,7 @@ export function MobileShell({ children, showTabs = true, className = '' }: Mobil
           showTabs ? 'pb-36' : 'pb-safe'
         } ${className}`}
       >
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
       {showTabs && <BottomTabBar />}
     </div>

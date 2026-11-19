@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   Check,
   CheckCircle2,
@@ -12,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
+import { TACTILE_TAP } from '../lib/motion';
 import { useAppState } from '../context/AppStateContext';
 import type { RainIntensity } from '../types/database';
 
@@ -75,9 +77,10 @@ export function RainCheckInPage() {
               const Icon = opt.icon;
               const active = opt.id === selected;
               return (
-                <button
+                <motion.button
                   key={opt.id}
                   type="button"
+                  whileTap={TACTILE_TAP}
                   onClick={() => setSelected(opt.id)}
                   className={`relative flex min-h-[144px] flex-col justify-between rounded-[24px] border-2 p-4 text-left transition ${
                     active
@@ -105,7 +108,7 @@ export function RainCheckInPage() {
                     <p className="text-lg font-bold text-[var(--ink)]">{opt.label}</p>
                     <p className="text-xs text-[var(--sub)]">{opt.hint}</p>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>

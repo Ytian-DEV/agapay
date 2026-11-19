@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -8,12 +9,13 @@ import {
   Clock,
   CloudOff,
   Database,
-  Loader2,
   LogIn,
   RefreshCw,
   Wifi,
 } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
+import { WovenThreadLoader } from '../components/WovenThreadLoader';
+import { TACTILE_TAP } from '../lib/motion';
 import { useAppState } from '../context/AppStateContext';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -175,14 +177,15 @@ export function SyncStatusPage() {
             </div>
           )}
 
-          <button
+          <motion.button
             type="button"
+            whileTap={TACTILE_TAP}
             disabled={!isOnline || syncing}
             onClick={handleSync}
             className="mt-4 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-sm font-bold text-[var(--on-accent)] transition disabled:opacity-45"
           >
             {syncing ? (
-              <Loader2 size={16} className="animate-spin" />
+              <WovenThreadLoader size="sm" />
             ) : (
               <RefreshCw size={16} />
             )}
@@ -193,7 +196,7 @@ export function SyncStatusPage() {
                 ? `Sync ${pendingSyncCount} queued report(s) now`
                 : 'Refresh from Supabase now'}
             </span>
-          </button>
+          </motion.button>
         </section>
 
         {/* Queued & Recent Farmer Reports */}

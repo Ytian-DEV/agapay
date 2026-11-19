@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   BookOpen,
   ChevronRight,
@@ -15,11 +16,15 @@ import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { StaggerGroup, StaggerItem } from '../components/MotionPrimitives';
+import { HomeSkeleton } from '../components/AgapaySkeletons';
+import { TACTILE_TAP } from '../lib/motion';
 import { useAppState } from '../context/AppStateContext';
 
 export function HomePage() {
   const { t } = useTranslation();
   const {
+    authLoading,
     barangays,
     crops,
     advisories,
@@ -91,8 +96,12 @@ export function HomePage() {
 
       <OfflineBanner />
 
-      <div className="space-y-3.5">
+      {authLoading ? (
+        <HomeSkeleton />
+      ) : (
+      <StaggerGroup className="space-y-3.5">
         {/* Selected Field Card */}
+        <StaggerItem>
         <section className="ag-card p-4">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -130,8 +139,10 @@ export function HomePage() {
             <span>Zone {activeParcel.grid_cell}</span>
           </div>
         </section>
+        </StaggerItem>
 
         {/* Planting Window Hero Card */}
+        <StaggerItem>
         <section className="ag-card p-4">
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--sub)]">
@@ -189,8 +200,10 @@ export function HomePage() {
             <ChevronRight size={18} />
           </Link>
         </section>
+        </StaggerItem>
 
         {/* Conditions 2-Column Row (Waterlogging + 7-Day Rain) */}
+        <StaggerItem>
         <section className="grid grid-cols-2 gap-3">
           <Link
             to="/map"
@@ -242,11 +255,14 @@ export function HomePage() {
             </div>
           </Link>
         </section>
+        </StaggerItem>
 
         {/* One-Tap Rain Check-In Prompt */}
+        <StaggerItem>
+        <motion.div whileTap={TACTILE_TAP}>
         <Link
           to="/rain-checkin"
-          className="flex min-h-[72px] items-center justify-between gap-3 rounded-[22px] bg-[var(--accent)] px-4 py-3.5 text-[var(--on-accent)] shadow-sm transition active:scale-[0.99]"
+          className="flex min-h-[72px] items-center justify-between gap-3 rounded-[22px] bg-[var(--accent)] px-4 py-3.5 text-[var(--on-accent)] shadow-sm transition"
         >
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15">
@@ -259,8 +275,11 @@ export function HomePage() {
           </div>
           <ChevronRight size={20} className="shrink-0" />
         </Link>
+        </motion.div>
+        </StaggerItem>
 
         {/* Quick Navigation Cards: What to Plant, Crop Guides, Yield Estimate */}
+        <StaggerItem>
         <section className="ag-card divide-y divide-[var(--border)] overflow-hidden">
           <Link
             to="/crops"
@@ -321,8 +340,10 @@ export function HomePage() {
             <ChevronRight size={18} className="text-[var(--sub)]" />
           </Link>
         </section>
+        </StaggerItem>
 
         {/* 7-Day Daily Rain Breakdown */}
+        <StaggerItem>
         <section className="ag-card p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-[var(--ink)]">Nov 20 – 26 · Daily rainfall</h3>
@@ -349,7 +370,9 @@ export function HomePage() {
             ))}
           </div>
         </section>
-      </div>
+        </StaggerItem>
+      </StaggerGroup>
+      )}
     </MobileShell>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   ArrowLeftRight,
   BookOpen,
@@ -16,6 +17,9 @@ import {
 import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
+import { StaggerGroup, StaggerItem } from '../components/MotionPrimitives';
+import { CropListSkeleton } from '../components/AgapaySkeletons';
+import { TACTILE_TAP } from '../lib/motion';
 import { useAppState } from '../context/AppStateContext';
 import { CROWDING_BY_BARANGAY } from '../data/seedData';
 import {
@@ -29,7 +33,8 @@ type CategoryFilter = 'all' | 'grains' | 'root_crop' | 'vegetable' | 'legume' | 
 
 export function CropSuggestionsPage() {
   const { t } = useTranslation();
-  const { barangays, crops, activeParcel, isOnline, lastSyncedAt, profile } = useAppState();
+  const { authLoading, barangays, crops, activeParcel, isOnline, lastSyncedAt, profile } =
+    useAppState();
 
   const currentMonth = new Date().getMonth() + 1; // 1..12
   const [selectedMonth, setSelectedMonth] = useState<number>(currentMonth);
@@ -151,9 +156,10 @@ export function CropSuggestionsPage() {
             const monthNum = i + 1;
             const active = monthNum === selectedMonth;
             return (
-              <button
+              <motion.button
                 key={m}
                 type="button"
+                whileTap={TACTILE_TAP}
                 onClick={() => setSelectedMonth(monthNum)}
                 className={`min-h-[36px] rounded-xl text-xs font-bold transition ${
                   active
@@ -162,7 +168,7 @@ export function CropSuggestionsPage() {
                 }`}
               >
                 {m}
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -220,6 +226,11 @@ export function CropSuggestionsPage() {
         </span>
       </div>
 
+      {authLoading ? (
+        <CropListSkeleton />
+      ) : (
+      <StaggerGroup>
+      <StaggerItem>
       <section className="ag-card divide-y divide-[var(--border)] overflow-hidden">
         {recommendedNow.length === 0 ? (
           <div className="p-4 text-center text-sm text-[var(--sub)]">
@@ -380,6 +391,9 @@ export function CropSuggestionsPage() {
         <BookOpen size={17} />
         <span>{t('crops.guidesTitle')}</span>
       </Link>
+      </StaggerItem>
+      </StaggerGroup>
+      )}
     </MobileShell>
   );
 }
