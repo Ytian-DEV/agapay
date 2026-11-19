@@ -19,6 +19,10 @@ import { CropCompareAndGuidesPage } from './pages/CropCompareAndGuidesPage';
 import { YieldEstimatePage } from './pages/YieldEstimatePage';
 import { HarvestFeedbackPage } from './pages/HarvestFeedbackPage';
 import { ForecastAccuracyPage } from './pages/ForecastAccuracyPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { PlansPage } from './pages/PlansPage';
+import { FieldsPage } from './pages/FieldsPage';
+import { PrivacyAndSourcesPage } from './pages/PrivacyAndSourcesPage';
 
 function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
   const { t } = useTranslation();
@@ -59,14 +63,10 @@ export default function App() {
             <Route path="/yield" element={<YieldEstimatePage />} />
             <Route path="/harvest-feedback" element={<HarvestFeedbackPage />} />
             <Route path="/accuracy" element={<ForecastAccuracyPage />} />
-            <Route
-              path="/fields"
-              element={<PlaceholderView titleKey="profile.manageFields" subtitleKey="home.selectedField" />}
-            />
-            <Route
-              path="/profile"
-              element={<PlaceholderView titleKey="profile.title" subtitleKey="profile.privacySupport" />}
-            />
+            <Route path="/fields" element={<FieldsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/plans" element={<PlansPage />} />
+            <Route path="/privacy" element={<PrivacyAndSourcesPage />} />
             <Route
               path="/lgu"
               element={<PlaceholderView titleKey="lgu.title" subtitleKey="lgu.privacyNote" />}
