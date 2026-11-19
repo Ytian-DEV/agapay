@@ -1,8 +1,9 @@
+import { useCallback, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import { AppStateProvider } from './context/AppStateContext';
-import { SplashScreen } from './components/SplashScreen';
+import { SplashScreen, shouldShowInitialSplash } from './components/SplashScreen';
 import { WelcomePage } from './pages/WelcomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SmsPreviewPage } from './pages/SmsPreviewPage';
@@ -58,13 +59,21 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  const [contentReady, setContentReady] = useState<boolean>(() => !shouldShowInitialSplash());
+
+  const handleSplashExitStart = useCallback(() => {
+    setContentReady(true);
+  }, []);
+
   return (
     <MotionConfig reducedMotion="user">
       <ThemeProvider>
         <AppStateProvider>
           <BrowserRouter>
-            <SplashScreen />
-            <AnimatedRoutes />
+            <div className="min-h-[100dvh] w-full bg-[var(--bg)] text-[var(--ink)]">
+              <SplashScreen onExitStart={handleSplashExitStart} />
+              {contentReady && <AnimatedRoutes />}
+            </div>
           </BrowserRouter>
         </AppStateProvider>
       </ThemeProvider>
