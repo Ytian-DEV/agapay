@@ -14,6 +14,11 @@ import { RainCheckInPage } from './pages/RainCheckInPage';
 import { MapPage } from './pages/MapPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { SyncStatusPage } from './pages/SyncStatusPage';
+import { CropSuggestionsPage } from './pages/CropSuggestionsPage';
+import { CropCompareAndGuidesPage } from './pages/CropCompareAndGuidesPage';
+import { YieldEstimatePage } from './pages/YieldEstimatePage';
+import { HarvestFeedbackPage } from './pages/HarvestFeedbackPage';
+import { ForecastAccuracyPage } from './pages/ForecastAccuracyPage';
 
 function PlaceholderView({ titleKey, subtitleKey }: { titleKey: string; subtitleKey: string }) {
   const { t } = useTranslation();
@@ -48,18 +53,12 @@ export default function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/sync" element={<SyncStatusPage />} />
-            <Route
-              path="/crops"
-              element={<PlaceholderView titleKey="crops.title" subtitleKey="crops.topThreeHint" />}
-            />
-            <Route
-              path="/crop-guides"
-              element={<PlaceholderView titleKey="crops.guidesTitle" subtitleKey="home.cropGuidesSub" />}
-            />
-            <Route
-              path="/yield"
-              element={<PlaceholderView titleKey="crops.yieldTitle" subtitleKey="home.yieldEstimateSub" />}
-            />
+            <Route path="/crops" element={<CropSuggestionsPage />} />
+            <Route path="/crop-compare" element={<CropCompareAndGuidesPage />} />
+            <Route path="/crop-guides" element={<CropCompareAndGuidesPage />} />
+            <Route path="/yield" element={<YieldEstimatePage />} />
+            <Route path="/harvest-feedback" element={<HarvestFeedbackPage />} />
+            <Route path="/accuracy" element={<ForecastAccuracyPage />} />
             <Route
               path="/fields"
               element={<PlaceholderView titleKey="profile.manageFields" subtitleKey="home.selectedField" />}
