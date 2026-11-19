@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CloudRain, ClipboardCheck } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { useAppState } from '../context/AppStateContext';
-import { BARANGAYS, FORECAST_ACCURACY_SERIES } from '../data/seedData';
 
 export function ForecastAccuracyPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeParcel, rainCheckins, harvestReports } = useAppState();
+  const { barangays, accuracySeries, activeParcel, rainCheckins, harvestReports } =
+    useAppState();
 
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
 
   // Dynamic accuracy score boosted slightly as the farmer logs real observations
   const baseAccuracy = 78;
@@ -28,15 +28,15 @@ export function ForecastAccuracyPage() {
   // Simple 6-week line chart points (viewBox 280 x 110)
   const maxVal = 65;
   const toPoint = (idx: number, val: number) => {
-    const x = 14 + (idx / (FORECAST_ACCURACY_SERIES.length - 1)) * 252;
+    const x = 14 + (idx / Math.max(1, accuracySeries.length - 1)) * 252;
     const y = 94 - (val / maxVal) * 78;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   };
 
-  const forecastLine = FORECAST_ACCURACY_SERIES.map((p, i) =>
+  const forecastLine = accuracySeries.map((p, i) =>
     toPoint(i, p.forecast_mm)
   ).join(' ');
-  const reportedLine = FORECAST_ACCURACY_SERIES.map((p, i) =>
+  const reportedLine = accuracySeries.map((p, i) =>
     toPoint(i, p.reported_mm)
   ).join(' ');
 

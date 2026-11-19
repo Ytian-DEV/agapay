@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CheckCircle2, Database, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { useAppState } from '../context/AppStateContext';
-import { DATA_SOURCES } from '../data/seedData';
 
 export function PrivacyAndSourcesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { consent, updateConsent, withdrawConsent } = useAppState();
+  const { dataSources, consent, updateConsent, withdrawConsent } = useAppState();
   const [withdrawnBanner, setWithdrawnBanner] = useState(false);
 
   const handleWithdraw = () => {
@@ -130,7 +129,7 @@ export function PrivacyAndSourcesPage() {
           </div>
 
           <div className="space-y-2.5">
-            {DATA_SOURCES.map((src) => (
+            {dataSources.map((src) => (
               <article key={src.id} className="ag-card p-4 text-xs leading-relaxed">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-sm font-bold text-[var(--ink)]">{src.dataset_name}</h3>

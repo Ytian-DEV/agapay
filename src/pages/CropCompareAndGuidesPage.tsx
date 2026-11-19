@@ -4,25 +4,26 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CheckCircle2, Droplets, Sprout } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { StatusPill } from '../components/StatusPill';
-import { CROPS } from '../data/seedData';
+import { useAppState } from '../context/AppStateContext';
 
 export function CropCompareAndGuidesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { crops } = useAppState();
 
   const initialTab = location.pathname.includes('guide') ? 'guides' : 'compare';
   const [tab, setTab] = useState<'compare' | 'guides'>(initialTab);
   const [selectedGuideSlug, setSelectedGuideSlug] = useState<string>('corn');
 
   const compareCrops = [
-    CROPS.find((c) => c.slug === 'rice')!,
-    CROPS.find((c) => c.slug === 'corn')!,
-    CROPS.find((c) => c.slug === 'sweet-potato')!,
+    crops.find((c) => c.slug === 'rice') ?? crops[0],
+    crops.find((c) => c.slug === 'corn') ?? crops[0],
+    crops.find((c) => c.slug === 'sweet-potato') ?? crops[0],
   ];
 
   const activeGuide =
-    CROPS.find((c) => c.slug === selectedGuideSlug) ?? CROPS[2];
+    crops.find((c) => c.slug === selectedGuideSlug) ?? crops[0];
 
   const costBadge = (tier: 'low' | 'medium' | 'high') =>
     tier === 'high' ? '₱₱₱' : tier === 'medium' ? '₱₱' : '₱';
@@ -165,7 +166,7 @@ export function CropCompareAndGuidesPage() {
         <section className="space-y-4 pb-6">
           {/* Crop selector pills */}
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {CROPS.map((c) => {
+            {crops.map((c) => {
               const active = c.slug === activeGuide.slug;
               return (
                 <button

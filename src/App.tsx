@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AppStateProvider } from './context/AppStateContext';
 import { WelcomePage } from './pages/WelcomePage';
+import { LoginPage } from './pages/LoginPage';
 import { SmsPreviewPage } from './pages/SmsPreviewPage';
 import { OnboardingFlowPage } from './pages/OnboardingFlowPage';
 import { HomePage } from './pages/HomePage';
@@ -28,6 +29,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<WelcomePage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/onboarding" element={<OnboardingFlowPage />} />
             <Route path="/sms-preview" element={<SmsPreviewPage />} />
             <Route path="/home" element={<HomePage />} />

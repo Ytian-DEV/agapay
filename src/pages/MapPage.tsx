@@ -14,19 +14,19 @@ import { MobileShell } from '../components/MobileShell';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
 import { useAppState } from '../context/AppStateContext';
-import { CROPS, MAP_GRID_CELLS } from '../data/seedData';
+import { MAP_GRID_CELLS } from '../data/seedData';
 import type { MapGridCell } from '../types/database';
 
 type MapLayer = 'suitability' | 'rain' | 'soil' | 'flood';
 
 export function MapPage() {
   const { t } = useTranslation();
-  const { activeParcel, lastSyncedAt } = useAppState();
+  const { crops, activeParcel, lastSyncedAt } = useAppState();
 
   const [layer, setLayer] = useState<MapLayer>('suitability');
   const [selectedId, setSelectedId] = useState<string>(activeParcel.grid_cell || 'B2');
 
-  const crop = CROPS.find((c) => c.slug === activeParcel.crop_slug) ?? CROPS[2];
+  const crop = crops.find((c) => c.slug === activeParcel.crop_slug) ?? crops[0];
   const selectedCell: MapGridCell =
     MAP_GRID_CELLS.find((c) => c.id === selectedId) ?? MAP_GRID_CELLS[4];
 

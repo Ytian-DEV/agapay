@@ -16,11 +16,14 @@ import { OfflineBanner } from '../components/OfflineBanner';
 import { StatusPill } from '../components/StatusPill';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { useAppState } from '../context/AppStateContext';
-import { ADVISORIES, BARANGAYS, CROPS, INITIAL_ALERTS } from '../data/seedData';
 
 export function HomePage() {
   const { t } = useTranslation();
   const {
+    barangays,
+    crops,
+    advisories,
+    alerts,
     activeParcel,
     parcels,
     setActiveParcelId,
@@ -30,12 +33,12 @@ export function HomePage() {
     profile,
   } = useAppState();
 
-  const crop = CROPS.find((c) => c.slug === activeParcel.crop_slug) ?? CROPS[2];
+  const crop = crops.find((c) => c.slug === activeParcel.crop_slug) ?? crops[0];
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
-  const advisory = ADVISORIES[crop.slug] ?? ADVISORIES.corn;
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
+  const advisory = advisories[crop.slug] ?? advisories.corn ?? Object.values(advisories)[0];
 
-  const activeAlertCount = INITIAL_ALERTS.filter((a) => a.is_active).length;
+  const activeAlertCount = alerts.filter((a) => a.is_active).length;
 
   const todayLabel = new Date().toLocaleDateString('en-PH', {
     weekday: 'short',

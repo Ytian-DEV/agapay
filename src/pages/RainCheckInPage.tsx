@@ -13,16 +13,15 @@ import {
 } from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { useAppState } from '../context/AppStateContext';
-import { BARANGAYS } from '../data/seedData';
 import type { RainIntensity } from '../types/database';
 
 export function RainCheckInPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeParcel, submitRainCheckIn, isOnline } = useAppState();
+  const { barangays, activeParcel, submitRainCheckIn, isOnline } = useAppState();
 
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
 
   const [selected, setSelected] = useState<RainIntensity>('light');
   const [stage, setStage] = useState<'pick' | 'review' | 'done'>('pick');

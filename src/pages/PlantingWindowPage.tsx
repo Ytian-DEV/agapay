@@ -13,7 +13,6 @@ import {
 import { MobileShell } from '../components/MobileShell';
 import { StatusPill } from '../components/StatusPill';
 import { useAppState } from '../context/AppStateContext';
-import { ADVISORIES, BARANGAYS, CROPS } from '../data/seedData';
 import type { RecommendationDispute } from '../types/database';
 
 const WINDOW_DAYS = Array.from({ length: 21 }, (_, idx) => ({
@@ -24,12 +23,12 @@ const WINDOW_DAYS = Array.from({ length: 21 }, (_, idx) => ({
 export function PlantingWindowPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeParcel, submitDispute } = useAppState();
+  const { barangays, crops, advisories, activeParcel, submitDispute } = useAppState();
 
-  const crop = CROPS.find((c) => c.slug === activeParcel.crop_slug) ?? CROPS[2];
+  const crop = crops.find((c) => c.slug === activeParcel.crop_slug) ?? crops[0];
   const barangay =
-    BARANGAYS.find((b) => b.id === activeParcel.barangay_id) ?? BARANGAYS[0];
-  const advisory = ADVISORIES[crop.slug] ?? ADVISORIES.corn;
+    barangays.find((b) => b.id === activeParcel.barangay_id) ?? barangays[0];
+  const advisory = advisories[crop.slug] ?? advisories.corn ?? Object.values(advisories)[0];
 
   const [showWhy, setShowWhy] = useState(true);
   const [disputeOpen, setDisputeOpen] = useState(false);

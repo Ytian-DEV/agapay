@@ -1,16 +1,27 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ArrowLeft, Check, MapPin, Plus, Trash2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Check,
+  Database,
+  Loader2,
+  MapPin,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { MobileShell } from '../components/MobileShell';
 import { useAppState } from '../context/AppStateContext';
-import { BARANGAYS, CROPS } from '../data/seedData';
+import { isUuid } from '../lib/supabase';
 import type { Crop } from '../types/database';
 
 export function FieldsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const {
+    barangays,
+    crops,
     parcels,
     activeParcel,
     setActiveParcelId,
@@ -21,20 +32,24 @@ export function FieldsPage() {
   } = useAppState();
 
   const [adding, setAdding] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [fieldName, setFieldName] = useState('');
-  const [barangayId, setBarangayId] = useState('brgy-gabas');
+  const [barangayId, setBarangayId] = useState(
+    barangays.find((b) => b.name === 'Gabas')?.id ?? barangays[0]?.id ?? ''
+  );
   const [cropSlug, setCropSlug] = useState<Crop['slug']>('sweet-potato');
   const [areaHa, setAreaHa] = useState('1.0');
 
   const parsedArea = Math.max(0.1, Number.parseFloat(areaHa) || 1.0);
   const isOutlier = parsedArea > 25;
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    const b = BARANGAYS.find((x) => x.id === barangayId) ?? BARANGAYS[0];
-    addParcel({
+    setSaving(true);
+    const b = barangays.find((x) => x.id === barangayId) ?? barangays[0];
+    await addParcel({
       field_name: fieldName.trim() || `${b.name} Plot`,
-      barangay_id: barangayId,
+      barangay_id: b.id,
       crop_slug: cropSlug,
       area_ha: parsedArea,
       is_outlier_flagged: isOutlier,
@@ -44,6 +59,7 @@ export function FieldsPage() {
       lng: b.center_lng,
       drainage_note: `${b.soil_texture} · ${b.drainage_class.replace('_', ' ')}`,
     });
+    setSaving(false);
     setFieldName('');
     setAdding(false);
   };
@@ -95,7 +111,7 @@ export function FieldsPage() {
                 onChange={(e) => setBarangayId(e.target.value)}
                 className="min-h-[48px] rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 text-sm font-semibold text-[var(--ink)]"
               >
-                {BARANGAYS.map((b) => (
+                {barangays.map((b) => (
                   <option key={b.id} value={b.id}>
                     Brgy. {b.name}
                   </option>
@@ -107,7 +123,7 @@ export function FieldsPage() {
                 onChange={(e) => setCropSlug(e.target.value as Crop['slug'])}
                 className="min-h-[48px] rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 text-sm font-semibold text-[var(--ink)]"
               >
-                {CROPS.map((c) => (
+                {crops.map((c) => (
                   <option key={c.id} value={c.slug}>
                     {c.name}
                   </option>
@@ -143,9 +159,11 @@ export function FieldsPage() {
               </button>
               <button
                 type="submit"
-                className="min-h-[48px] flex-1 rounded-full bg-[var(--accent)] text-sm font-bold text-[var(--on-accent)]"
+                disabled={saving}
+                className="flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-full bg-[var(--accent)] text-sm font-bold text-[var(--on-accent)] disabled:opacity-60"
               >
-                {t('common.save')}
+                {saving && <Loader2 size={15} className="animate-spin" />}
+                <span>{saving ? 'Saving...' : t('common.save')}</span>
               </button>
             </div>
           </form>
@@ -153,10 +171,11 @@ export function FieldsPage() {
 
         {parcels.map((parcel) => {
           const isActive = parcel.id === activeParcel.id;
-          const b = BARANGAYS.find((x) => x.id === parcel.barangay_id) ?? BARANGAYS[0];
-          const c = CROPS.find((x) => x.slug === parcel.crop_slug) ?? CROPS[2];
+          const b = barangays.find((x) => x.id === parcel.barangay_id) ?? barangays[0];
+          const c = crops.find((x) => x.slug === parcel.crop_slug) ?? crops[0];
           const fieldRains = rainCheckins.filter((r) => r.parcel_id === parcel.id).length;
           const fieldHarvests = harvestReports.filter((h) => h.parcel_id === parcel.id).length;
+          const isCloudSaved = isUuid(parcel.id);
 
           return (
             <section
@@ -167,17 +186,22 @@ export function FieldsPage() {
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-lg font-bold text-[var(--ink)]">{parcel.field_name}</h2>
                     {isActive && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-[var(--accent-soft)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--accent)]">
                         <Check size={12} strokeWidth={3} /> Active
                       </span>
                     )}
+                    {isCloudSaved && (
+                      <span className="status-go inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                        <Database size={10} /> Supabase
+                      </span>
+                    )}
                   </div>
                   <p className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-[var(--sub)]">
                     <MapPin size={13} />
-                    Brgy. {b.name} · Zone {parcel.grid_cell} · {parcel.area_ha}{' '}
+                    Brgy. {b?.name ?? 'Gabas'} · Zone {parcel.grid_cell} · {parcel.area_ha}{' '}
                     {t('common.hectares')}
                   </p>
                 </div>
@@ -186,7 +210,7 @@ export function FieldsPage() {
                   <button
                     type="button"
                     aria-label="Delete field"
-                    onClick={() => deleteParcel(parcel.id)}
+                    onClick={() => void deleteParcel(parcel.id)}
                     className="flex h-10 w-10 items-center justify-center rounded-full text-[var(--sub)] hover:bg-[var(--avoid-bg)] hover:text-[var(--avoid-text)]"
                   >
                     <Trash2 size={17} />
@@ -197,7 +221,7 @@ export function FieldsPage() {
               <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl bg-[var(--bg)] p-2.5 text-center text-xs">
                 <div>
                   <p className="text-[var(--sub)]">Crop</p>
-                  <p className="font-bold text-[var(--ink)]">{c.name}</p>
+                  <p className="font-bold text-[var(--ink)]">{c?.name ?? 'Corn'}</p>
                 </div>
                 <div>
                   <p className="text-[var(--sub)]">Parcel ID</p>
