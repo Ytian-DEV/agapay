@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import * as maplibregl from 'maplibre-gl';
+import {
+  Map as MapLibreMap,
+  Marker,
+  NavigationControl,
+  GeolocateControl,
+  ScaleControl,
+  Popup,
+  type GeoJSONSource,
+  type MapLayerMouseEvent,
+  type StyleSpecification,
+} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Layers, Radar } from 'lucide-react';
+import { Layers, Mountain, Radar } from 'lucide-react';
 import type { Barangay, DecisionStatus } from '../types/database';
 
 export type ForecastLayer = 'rain' | 'soil' | 'flood' | 'suitability';
@@ -63,9 +73,6 @@ function getZoneReading(z: BarangayZoneFeatureData, layer: ForecastLayer): strin
   return z.decision.toUpperCase();
 }
 
-/**
- * Generates clean GeoJSON forecast zones over each Baybay City barangay.
- */
 function buildZonesGeoJson(
   zones: BarangayZoneFeatureData[],
   layer: ForecastLayer
@@ -147,18 +154,17 @@ export function buildBarangayZones(barangays: Barangay[]): BarangayZoneFeatureDa
   });
 }
 
-function getMapStyle(
-  basemap: 'streets' | 'satellite',
+function getMapLibreStyle(
+  basemap: 'vector' | 'satellite',
   isDark: boolean
-): string | maplibregl.StyleSpecification {
-  if (basemap === 'streets') {
-    // 100% free, zero-API-key official OpenFreeMap vector tiles for MapLibre GL!
+): string | StyleSpecification {
+  if (basemap === 'vector') {
+    // Official open MapLibre GL v8 vector tile styles (zero API key required)
     return isDark
-      ? 'https://tiles.openfreemap.org/styles/dark'
+      ? 'https://tiles.openfreemap.org/styles/fiord'
       : 'https://tiles.openfreemap.org/styles/liberty';
   }
 
-  // Free zero-API-key ESRI World Imagery satellite + place labels
   return {
     version: 8,
     sources: {
@@ -198,13 +204,15 @@ export function BaybayForecastMap({
   flyToTrigger,
 }: BaybayForecastMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const fieldMarkerRef = useRef<maplibregl.Marker | null>(null);
-  const zoneMarkersRef = useRef<maplibregl.Marker[]>([]);
+  const mapRef = useRef<MapLibreMap | null>(null);
+  const fieldMarkerRef = useRef<Marker | null>(null);
+  const zoneMarkersRef = useRef<Marker[]>([]);
+  const popupRef = useRef<Popup | null>(null);
   const onSelectZoneRef = useRef(onSelectZone);
   onSelectZoneRef.current = onSelectZone;
 
-  const [basemap, setBasemap] = useState<'streets' | 'satellite'>('streets');
+  const [basemap, setBasemap] = useState<'vector' | 'satellite'>('vector');
+  const [is3dTilt, setIs3dTilt] = useState(false);
   const [radarTileUrl, setRadarTileUrl] = useState<string | null>(null);
   const [radarActive, setRadarActive] = useState(false);
 
@@ -226,15 +234,15 @@ export function BaybayForecastMap({
         }
       })
       .catch(() => {
-        // Offline or network restricted — GeoJSON rainfall overlay still renders cleanly
+        // Offline or restricted — GeoJSON forecast zones still render
       });
     return () => {
       cancelled = true;
     };
   }, [isOnline]);
 
-  // Sync GeoJSON forecast polygons + live RainViewer radar onto an already-loaded map
-  const syncForecastLayers = (map: maplibregl.Map) => {
+  // Sync GeoJSON forecast polygons + live RainViewer radar onto MapLibre GL
+  const syncForecastLayers = (map: MapLibreMap) => {
     if (!map.getSource('agapay-zones')) {
       map.addSource('agapay-zones', {
         type: 'geojson',
@@ -264,7 +272,7 @@ export function BaybayForecastMap({
         },
       });
 
-      map.on('click', 'agapay-zones-fill', (e: maplibregl.MapLayerMouseEvent) => {
+      map.on('click', 'agapay-zones-fill', (e: MapLayerMouseEvent) => {
         const brgyId = e.features?.[0]?.properties?.barangayId as string | undefined;
         if (brgyId) onSelectZoneRef.current(brgyId);
       });
@@ -275,7 +283,7 @@ export function BaybayForecastMap({
         map.getCanvas().style.cursor = '';
       });
     } else {
-      const src = map.getSource('agapay-zones') as maplibregl.GeoJSONSource;
+      const src = map.getSource('agapay-zones') as GeoJSONSource;
       src.setData(geojson);
       if (map.getLayer('agapay-zones-outline')) {
         map.setPaintProperty('agapay-zones-outline', 'line-width', [
@@ -287,7 +295,6 @@ export function BaybayForecastMap({
       }
     }
 
-    // Sync live RainViewer precipitation radar layer when Rain tab is active
     const hasRadarLayer = Boolean(map.getLayer('agapay-rain-radar-layer'));
     if (layer === 'rain' && radarTileUrl) {
       if (!map.getSource('agapay-rain-radar')) {
@@ -319,21 +326,30 @@ export function BaybayForecastMap({
     }
   };
 
-  // Initialize MapLibre GL map (re-creates cleanly when basemap or theme switches)
+  // Initialize official MapLibre GL JS Map with NavigationControl, GeolocateControl & ScaleControl
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const map = new maplibregl.Map({
+    const map = new MapLibreMap({
       container: containerRef.current,
       center: [fieldLng || 124.8005, fieldLat || 10.7145],
       zoom: 12.0,
       minZoom: 9.5,
       maxZoom: 17,
+      pitch: is3dTilt ? 48 : 0,
       attributionControl: false,
-      style: getMapStyle(basemap, isDark),
+      style: getMapLibreStyle(basemap, isDark),
     });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+    map.addControl(new NavigationControl({ visualizePitch: true }), 'top-right');
+    map.addControl(
+      new GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: false,
+      }),
+      'top-right'
+    );
+    map.addControl(new ScaleControl({ maxWidth: 90, unit: 'metric' }), 'bottom-right');
 
     map.on('load', () => {
       syncForecastLayers(map);
@@ -342,6 +358,8 @@ export function BaybayForecastMap({
     mapRef.current = map;
 
     return () => {
+      popupRef.current?.remove();
+      popupRef.current = null;
       fieldMarkerRef.current?.remove();
       fieldMarkerRef.current = null;
       zoneMarkersRef.current.forEach((m) => m.remove());
@@ -352,7 +370,14 @@ export function BaybayForecastMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [basemap, isDark]);
 
-  // Update forecast layers whenever layer, zones, selection, or live radar changes
+  // Toggle 3D perspective tilt smoothly via MapLibre easeTo
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.easeTo({ pitch: is3dTilt ? 48 : 0, bearing: is3dTilt ? -12 : 0, duration: 450 });
+  }, [is3dTilt]);
+
+  // Sync GeoJSON forecast layers & RainViewer radar
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -365,7 +390,7 @@ export function BaybayForecastMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geojson, selectedBarangayId, layer, radarTileUrl]);
 
-  // Render crisp interactive barangay forecast badges directly on the real map
+  // Interactive MapLibre Markers for each Baybay City barangay
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -382,7 +407,7 @@ export function BaybayForecastMap({
       el.type = 'button';
       el.style.cssText = `
         display:flex;align-items:center;gap:4px;
-        background:${isSelected ? color : 'rgba(17,19,18,0.82)'};
+        background:${isSelected ? color : 'rgba(17,19,18,0.84)'};
         color:#ffffff;
         border:2px solid ${color};
         border-radius:999px;
@@ -391,7 +416,7 @@ export function BaybayForecastMap({
         font-weight:700;
         cursor:pointer;
         white-space:nowrap;
-        box-shadow:0 2px 8px rgba(0,0,0,0.3);
+        box-shadow:0 2px 8px rgba(0,0,0,0.32);
       `;
       el.innerHTML = `<span>${z.name}</span><span style="opacity:.95;">· ${reading}</span>`;
       el.addEventListener('click', (ev) => {
@@ -399,20 +424,21 @@ export function BaybayForecastMap({
         onSelectZoneRef.current(z.barangayId);
       });
 
-      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      const marker = new Marker({ element: el, anchor: 'center' })
         .setLngLat([z.centerLng, z.centerLat])
         .addTo(map);
       zoneMarkersRef.current.push(marker);
     });
   }, [zones, layer, selectedBarangayId, basemap, isDark]);
 
-  // Render farmer's active field pin slightly offset above center so it never hides the barangay badge
+  // Farmer's active field pin using MapLibre Marker + Popup
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     fieldMarkerRef.current?.remove();
     const el = document.createElement('div');
+    el.style.cursor = 'pointer';
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:5px;background:#111312;color:#ffffff;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,0.4);border:2px solid #4fb67f;white-space:nowrap;">
         <span style="width:8px;height:8px;border-radius:999px;background:#4fb67f;display:inline-block;"></span>
@@ -420,12 +446,17 @@ export function BaybayForecastMap({
       </div>
     `;
 
-    fieldMarkerRef.current = new maplibregl.Marker({
+    const popup = new Popup({ offset: 22, closeButton: false }).setHTML(
+      `<div style="font-family:DM Sans,sans-serif;font-size:12px;color:#111312;"><strong>${fieldName}</strong><br/>Baybay City, Leyte</div>`
+    );
+
+    fieldMarkerRef.current = new Marker({
       element: el,
       anchor: 'bottom',
       offset: [0, -18],
     })
       .setLngLat([fieldLng || 124.7962, fieldLat || 10.7285])
+      .setPopup(popup)
       .addTo(map);
   }, [fieldLng, fieldLat, fieldName, basemap, isDark]);
 
@@ -447,19 +478,34 @@ export function BaybayForecastMap({
     <div className="relative overflow-hidden rounded-[22px] border border-[var(--border)] bg-[var(--surface)] shadow-sm">
       <div ref={containerRef} className="h-[340px] w-full sm:h-[380px]" />
 
-      {/* Top-Left Basemap Toggle & Live Radar Pill */}
+      {/* Top-Left MapLibre Controls: Vector/Satellite + 3D Tilt + Live Radar Pill */}
       <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col gap-1.5">
-        <button
-          type="button"
-          onClick={() => setBasemap((b) => (b === 'streets' ? 'satellite' : 'streets'))}
-          className="pointer-events-auto inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)]/95 px-3 text-xs font-bold text-[var(--ink)] shadow-sm backdrop-blur-xs"
-        >
-          <Layers size={14} className="text-[var(--accent)]" />
-          <span>{basemap === 'streets' ? 'Satellite view' : 'Map view'}</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setBasemap((b) => (b === 'vector' ? 'satellite' : 'vector'))}
+            className="pointer-events-auto inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)]/95 px-3 text-xs font-bold text-[var(--ink)] shadow-sm backdrop-blur-xs"
+          >
+            <Layers size={14} className="text-[var(--accent)]" />
+            <span>{basemap === 'vector' ? 'Satellite' : 'Vector'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIs3dTilt((v) => !v)}
+            className={`pointer-events-auto inline-flex min-h-[36px] items-center gap-1 rounded-full border px-2.5 text-xs font-bold shadow-sm backdrop-blur-xs ${
+              is3dTilt
+                ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]'
+                : 'border-[var(--border)] bg-[var(--surface)]/95 text-[var(--ink)]'
+            }`}
+          >
+            <Mountain size={13} />
+            <span>{is3dTilt ? '3D' : '2D'}</span>
+          </button>
+        </div>
 
         {layer === 'rain' && radarActive && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600/90 px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-blue-600/90 px-2.5 py-1 text-[10px] font-bold text-white shadow-xs">
             <Radar size={12} />
             Live Rain Radar
           </span>
